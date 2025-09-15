@@ -1,19 +1,154 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './LearnPage.css';
 
 const LearnPage = ({ onBackClick }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState('');
+  const [englishWord, setEnglishWord] = useState('');
+  const [dutchWord, setDutchWord] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [nextWordQueue, setNextWordQueue] = useState([]);
   const cardRef = useRef(null);
   const startX = useRef(0);
   const startY = useRef(0);
   const currentX = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
-  
-  // Hardcoded words for now
-  const frontWord = "slaap";
-  const backWord = "sleep";
+
+  // Function to fetch multiple random English words at once
+  const fetchRandomWords = async (count = 5) => {
+    try {
+      const response = await fetch(`https://random-word-api.vercel.app/api?words=${count}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch random words');
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching random words:', error);
+      throw error;
+    }
+  };
+
+  // Function to fetch word details and extract Dutch translation
+  const fetchWordDetails = async (word) => {
+    try {
+      const response = await fetch(`https://freedictionaryapi.com/api/v1/entries/en/${word}?translations=true`);
+      if (!response.ok) {
+        return null; // Skip word if API fails
+      }
+      const data = await response.json();
+      
+      // Look for Dutch translation
+      if (data.entries && data.entries.length > 0) {
+        for (const entry of data.entries) {
+          if (entry.senses && entry.senses.length > 0) {
+            for (const sense of entry.senses) {
+              if (sense.translations && sense.translations.length > 0) {
+                const dutchTranslation = sense.translations.find(
+                  translation => translation.language.code === 'nl'
+                );
+                if (dutchTranslation) {
+                  return dutchTranslation.word;
+                }
+              }
+            }
+          }
+        }
+      }
+      return null; // No Dutch translation found
+    } catch (error) {
+      console.error('Error fetching word details:', error);
+      return null; // Skip word on error
+    }
+  };
+
+  // Function to process multiple words in parallel and find ones with Dutch translations
+  const findWordsWithDutchTranslations = async (words) => {
+    const promises = words.map(async (word) => {
+      const dutchTranslation = await fetchWordDetails(word);
+      return dutchTranslation ? { english: word, dutch: dutchTranslation } : null;
+    });
+
+    const results = await Promise.all(promises);
+    return results.filter(result => result !== null);
+  };
+
+  // Function to load words into the queue
+  const loadWordsIntoQueue = async () => {
+    try {
+      const randomWords = await fetchRandomWords(10); // Fetch 10 words at once
+      const wordsWithTranslations = await findWordsWithDutchTranslations(randomWords);
+      
+      if (wordsWithTranslations.length > 0) {
+        setNextWordQueue(prev => [...prev, ...wordsWithTranslations]);
+      }
+    } catch (error) {
+      console.error('Error loading words into queue:', error);
+    }
+  };
+
+  // Function to get next word from queue
+  const getNextWord = async () => {
+    // If queue is running low, load more words in background
+    if (nextWordQueue.length <= 2) {
+      loadWordsIntoQueue(); // Don't await this - let it run in background
+    }
+
+    if (nextWordQueue.length > 0) {
+      const nextWord = nextWordQueue[0];
+      setNextWordQueue(prev => prev.slice(1));
+      return nextWord;
+    }
+
+    // Fallback: try to get a word immediately
+    try {
+      const randomWords = await fetchRandomWords(5);
+      const wordsWithTranslations = await findWordsWithDutchTranslations(randomWords);
+      
+      if (wordsWithTranslations.length > 0) {
+        return wordsWithTranslations[0];
+      }
+    } catch (error) {
+      console.error('Error in fallback word fetch:', error);
+    }
+
+    // Final fallback
+    return { english: 'sleep', dutch: 'slaap' };
+  };
+
+  // Function to load a new word with English and Dutch
+  const loadNewWord = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const wordPair = await getNextWord();
+      setEnglishWord(wordPair.english);
+      setDutchWord(wordPair.dutch);
+    } catch (error) {
+      console.error('Error loading new word:', error);
+      setError('Failed to load word. Please try again.');
+      // Fallback to hardcoded words
+      setEnglishWord('sleep');
+      setDutchWord('slaap');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load initial words when component mounts
+  useEffect(() => {
+    const initializeWords = async () => {
+      // Load initial queue
+      await loadWordsIntoQueue();
+      // Load first word
+      await loadNewWord();
+    };
+    
+    initializeWords();
+  }, []);
 
   const handleCardClick = () => {
     if (!isDragging.current) {
@@ -125,6 +260,7 @@ const LearnPage = ({ onBackClick }) => {
             cardRef.current.style.opacity = '1';
             setSwipeDirection('');
             setIsFlipped(false); // Reset flip state for new card
+            loadNewWord(); // Load new word after swipe
           }
         }, 300);
       } else {
@@ -161,34 +297,53 @@ const LearnPage = ({ onBackClick }) => {
 
       {/* Flashcard container */}
       <div className="flashcard-container">
-        <div 
-          ref={cardRef}
-          className={`flashcard ${isFlipped ? 'flipped' : ''} ${swipeDirection ? `swipe-${swipeDirection}` : ''}`} 
-          onClick={handleCardClick}
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleEnd}
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
-        >
-          {/* Card front */}
-          <div className="card-face card-front">
-            <img src="/assets/card.png" alt="Card" className="card-background" />
-            <div className="card-content">
-              <div className="word">{frontWord}</div>
+        {isLoading ? (
+          <div className="loading-card">
+            <div className="loading-text">Loading new word...</div>
+          </div>
+        ) : error ? (
+          <div className="error-card">
+            <div className="error-text">{error}</div>
+            <button onClick={loadNewWord} className="retry-button">Try Again</button>
+          </div>
+        ) : (
+          <div 
+            ref={cardRef}
+            className={`flashcard ${isFlipped ? 'flipped' : ''} ${swipeDirection ? `swipe-${swipeDirection}` : ''}`} 
+            onClick={handleCardClick}
+            onMouseDown={handleStart}
+            onMouseMove={handleMove}
+            onMouseUp={handleEnd}
+            onMouseLeave={handleEnd}
+            onTouchStart={handleStart}
+            onTouchMove={handleMove}
+            onTouchEnd={handleEnd}
+          >
+            {/* Card front */}
+            <div className="card-face card-front">
+              <img src="/assets/card.png" alt="Card" className="card-background" />
+              <div className="card-content">
+                <div className="language-indicator">
+                  <span className="flag">🇳🇱</span>
+                  <span className="language-name">Dutch</span>
+                </div>
+                <div className="word">{dutchWord}</div>
+              </div>
+            </div>
+            
+            {/* Card back */}
+            <div className="card-face card-back">
+              <img src="/assets/card.png" alt="Card" className="card-background" />
+              <div className="card-content">
+                <div className="language-indicator">
+                  <span className="flag">🇺🇸</span>
+                  <span className="language-name">English</span>
+                </div>
+                <div className="word">{englishWord}</div>
+              </div>
             </div>
           </div>
-          
-          {/* Card back */}
-          <div className="card-face card-back">
-            <img src="/assets/card.png" alt="Card" className="card-background" />
-            <div className="card-content">
-              <div className="word">{backWord}</div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Bottom instructions */}
