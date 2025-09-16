@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './LearnPage.css';
+import wordsData from './data/words.json';
 
 const LearnPage = ({ onBackClick }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -16,19 +17,19 @@ const LearnPage = ({ onBackClick }) => {
   const currentY = useRef(0);
   const isDragging = useRef(false);
 
-  // Function to fetch multiple random English words at once
-  const fetchRandomWords = async (count = 5) => {
-    try {
-      const response = await fetch(`https://random-word-api.vercel.app/api?words=${count}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch random words');
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Error fetching random words:', error);
-      throw error;
+  // Function to get multiple random English words from local JSON data
+  const getRandomWords = (count = 5) => {
+    // Create a copy of the words array
+    const wordsCopy = [...wordsData];
+    
+    // Fisher-Yates shuffle for better randomization
+    for (let i = wordsCopy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [wordsCopy[i], wordsCopy[j]] = [wordsCopy[j], wordsCopy[i]];
     }
+    
+    // Return the requested number of words
+    return wordsCopy.slice(0, count);
   };
 
   // Function to fetch word details and extract Dutch translation
@@ -78,7 +79,7 @@ const LearnPage = ({ onBackClick }) => {
   // Function to load words into the queue
   const loadWordsIntoQueue = async () => {
     try {
-      const randomWords = await fetchRandomWords(10); // Fetch 10 words at once
+      const randomWords = getRandomWords(10); // Get 10 random words from local data
       const wordsWithTranslations = await findWordsWithDutchTranslations(randomWords);
       
       if (wordsWithTranslations.length > 0) {
@@ -104,7 +105,7 @@ const LearnPage = ({ onBackClick }) => {
 
     // Fallback: try to get a word immediately
     try {
-      const randomWords = await fetchRandomWords(5);
+      const randomWords = getRandomWords(5);
       const wordsWithTranslations = await findWordsWithDutchTranslations(randomWords);
       
       if (wordsWithTranslations.length > 0) {
