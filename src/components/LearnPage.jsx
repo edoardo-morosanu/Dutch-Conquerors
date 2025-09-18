@@ -32,35 +32,35 @@ const LearnPage = ({ onBackClick }) => {
     return wordsCopy.slice(0, count);
   };
 
-  // Function to fetch word details and extract Dutch translation
+  // Function to fetch Dutch translation using Vite proxy
   const fetchWordDetails = async (word) => {
     try {
-      const response = await fetch(`https://freedictionaryapi.com/api/v1/entries/en/${word}?translations=true`);
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: word,
+          source_lang: 'EN',
+          target_lang: 'NL'
+        })
+      });
+      
       if (!response.ok) {
         return null; // Skip word if API fails
       }
+      
       const data = await response.json();
       
-      // Look for Dutch translation
-      if (data.entries && data.entries.length > 0) {
-        for (const entry of data.entries) {
-          if (entry.senses && entry.senses.length > 0) {
-            for (const sense of entry.senses) {
-              if (sense.translations && sense.translations.length > 0) {
-                const dutchTranslation = sense.translations.find(
-                  translation => translation.language.code === 'nl'
-                );
-                if (dutchTranslation) {
-                  return dutchTranslation.word;
-                }
-              }
-            }
-          }
-        }
+      // Check if translation was successful
+      if (data.code === 200 && data.data) {
+        return data.data;
       }
-      return null; // No Dutch translation found
+      
+      return null; // No translation found
     } catch (error) {
-      console.error('Error fetching word details:', error);
+      console.error('Error fetching word translation:', error);
       return null; // Skip word on error
     }
   };
