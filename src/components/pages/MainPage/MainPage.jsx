@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './MainPage.css';
-import RulesPopup from './RulesPopup';
+import RulesPopup from '../../ui/RulesPopup/RulesPopup';
 
 const MainPage = ({ onPlayClick, onLearnClick }) => {
   const [showRules, setShowRules] = useState(false);
@@ -22,7 +22,7 @@ const MainPage = ({ onPlayClick, onLearnClick }) => {
       
       <div className="content-container">
         <div className="logo-container">
-          <img src="/assets/logo.png" alt="Dutch Conquerors" className="game-logo" />
+          <img src="/assets/images/logo.png" alt="Dutch Conquerors" className="game-logo" />
           <h1 className="game-title">Dutch Conquerors</h1>
         </div>
         

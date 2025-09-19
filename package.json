@@ -1,33 +1,33 @@
 {
-    "name": "template-react",
-    "description": "A Phaser 3 project template that demonstrates React communication and uses Vite for bundling.",
+    "name": "dutch-conquerors",
+    "description": "Dutch Conquerors - A React-based educational application about learning the Dutch language.",
     "version": "1.2.0",
     "type": "module",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/phaserjs/template-react.git"
+        "url": "git+https://github.com/edoardo-morosanu/Dutch-Conquerors.git"
     },
-    "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
+    "author": "Edoardo Andrei Morosanu",
     "license": "MIT",
     "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
     "bugs": {
-        "url": "https://github.com/phaserjs/template-react/issues"
+        "url": "https://github.com/edoardo-morosanu/Dutch-Conquerors/issues"
     },
-    "homepage": "https://github.com/phaserjs/template-react#readme",
+    "homepage": "https://github.com/edoardo-morosanu/Dutch-Conquerors#readme",
     "keywords": [
-        "phaser",
-        "phaser3",
         "react",
-        "vite"
+        "vite",
+        "education",
+        "dutch-history",
+        "maritime"
     ],
     "scripts": {
-        "dev": "node log.js dev & vite --config vite/config.dev.mjs",
-        "build": "node log.js build & vite build --config vite/config.prod.mjs",
-        "dev-nolog": "vite --config vite/config.dev.mjs",
-        "build-nolog": "vite build --config vite/config.prod.mjs"
+        "dev": "node log.js dev & vite --config config/config.dev.mjs",
+        "build": "node log.js build & vite build --config config/config.prod.mjs",
+        "dev-nolog": "vite --config config/config.dev.mjs",
+        "build-nolog": "vite build --config config/config.prod.mjs"
     },
     "dependencies": {
-        "phaser": "^3.90.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },
