@@ -231,7 +231,7 @@ const GamePage = ({ onBackClick }) => {
                 <div className="ships-container" style={{ top: `${shipsTop}px` }}>
                     {shipWords.map((word, index) => (
                         <div key={index} className={`ship-card ${index === cannonPosition ? 'highlighted' : ''} ${hitShipIndex === index ? 'hit-flash' : ''}`}>
-                            <img src="/assets/ship.png" alt="Ship" className="ship-image" />
+                            <img src="/assets/images/ship.png" alt="Ship" className="ship-image" />
                             <div className="word-label">
                                 {word}
                             </div>
@@ -246,7 +246,7 @@ const GamePage = ({ onBackClick }) => {
 
                 {/* Cannon */}
                 <div className="cannon-container" style={{ left: calculateCannonLeft() }}>
-                    <img src="/assets/cannon.png" alt="Cannon" className="cannon" />
+                    <img src="/assets/images/cannon.png" alt="Cannon" className="cannon" />
                 </div>
 
                 {/* Cannonballs */}
@@ -257,7 +257,7 @@ const GamePage = ({ onBackClick }) => {
                         className="cannonball" 
                         style={{ left: calculatePositionForIndex(ball.cannonPos) }}
                     >
-                        <img src="/assets/cannonball.png" alt="Cannonball" />
+                        <img src="/assets/images/cannonball.png" alt="Cannonball" />
                     </div>
                 ))}
 

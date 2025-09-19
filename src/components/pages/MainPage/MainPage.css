@@ -11,9 +11,8 @@
 }
 
 .background-container {
-    background:
-        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-        url("/assets/menu_bg.png") center;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url("/assets/images/menu_bg.png") center;
     background-size: 115%;
     position: absolute;
     top: 0;
@@ -71,9 +70,7 @@
     font-size: 3.5rem;
     font-weight: 900;
     color: #ffffff;
-    text-shadow:
-        2px 2px 0px #8b4513,
-        4px 4px 0px #654321,
+    text-shadow: 2px 2px 0px #8b4513, 4px 4px 0px #654321,
         6px 6px 10px rgba(0, 0, 0, 0.8);
     margin: 0;
     text-align: center;
@@ -117,8 +114,7 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.6),
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 rgba(0, 0, 0, 0.3);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -132,8 +128,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background:
-        repeating-linear-gradient(
+    background: repeating-linear-gradient(
             90deg,
             transparent,
             transparent 2px,
@@ -152,8 +147,7 @@
 
 .menu-button:hover {
     transform: translateY(-3px);
-    box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.7),
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7),
         inset 0 2px 0 rgba(255, 255, 255, 0.3),
         inset 0 -2px 0 rgba(0, 0, 0, 0.2);
     border-color: #8b4513;
@@ -161,8 +155,7 @@
 
 .menu-button:active {
     transform: translateY(-1px);
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.6),
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.1),
         inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
@@ -195,8 +188,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
-    box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.6),
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
@@ -209,8 +201,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background:
-        repeating-linear-gradient(
+    background: repeating-linear-gradient(
             90deg,
             transparent,
             transparent 2px,
@@ -229,8 +220,7 @@
 
 .icon-button:hover {
     transform: translateY(-3px);
-    box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.7),
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7),
         inset 0 2px 0 rgba(255, 255, 255, 0.3),
         inset 0 -2px 0 rgba(0, 0, 0, 0.2);
     border-color: #8b4513;
@@ -238,8 +228,7 @@
 
 .icon-button:active {
     transform: translateY(-1px);
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.6),
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6),
         + inset 0 2px 0 rgba(255, 255, 255, 0.1),
         inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
@@ -307,3 +296,4 @@
         padding: 15px;
     }
 }
+

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './LearnPage.css';
-import wordsData from './data/words.json';
+import wordsData from '../../../data/words.json';
 
 const LearnPage = ({ onBackClick }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -322,7 +322,7 @@ const LearnPage = ({ onBackClick }) => {
           >
             {/* Card front */}
             <div className="card-face card-front">
-              <img src="/assets/card.png" alt="Card" className="card-background" />
+              <img src="/assets/images/card.png" alt="Card" className="card-background" />
               <div className="card-content">
                 <div className="language-indicator">
                   <span className="flag">🇳🇱</span>
@@ -334,7 +334,7 @@ const LearnPage = ({ onBackClick }) => {
             
             {/* Card back */}
             <div className="card-face card-back">
-              <img src="/assets/card.png" alt="Card" className="card-background" />
+              <img src="/assets/images/card.png" alt="Card" className="card-background" />
               <div className="card-content">
                 <div className="language-indicator">
                   <span className="flag">🇺🇸</span>

@@ -61,7 +61,7 @@ const RulesPopup = ({ isOpen, onClose }) => {
                     <button
                         className="start-adventure-button"
                         onClick={onClose}
-                    >x
+                    >
                         Ready to Sail!
                     </button>
                 </div>

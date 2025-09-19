@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import MainPage from './components/MainPage';
-import LearnPage from './components/LearnPage';
-import GamePage from './components/GamePage';
+import MainPage from './components/pages/MainPage/MainPage';
+import LearnPage from './components/pages/LearnPage/LearnPage';
+import GamePage from './components/pages/GamePage/GamePage';
 
 function App ()
 {
