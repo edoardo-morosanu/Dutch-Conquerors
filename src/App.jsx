@@ -2,16 +2,16 @@ import { useState } from 'react';
 
 import MainPage from './components/MainPage';
 import LearnPage from './components/LearnPage';
+import GamePage from './components/GamePage';
 
 function App ()
 {
     // Page state management
-    const [currentPage, setCurrentPage] = useState('main'); // 'main', 'learn'
+    const [currentPage, setCurrentPage] = useState('main'); // 'main', 'learn', 'game'
 
     // Page navigation handlers
     const handlePlayClick = () => {
-        // For now, just show an alert that the game is coming soon
-        alert('Game functionality is being rebuilt without Phaser!');
+        setCurrentPage('game');
     };
 
     const handleLearnClick = () => {
@@ -29,6 +29,10 @@ function App ()
 
     if (currentPage === 'learn') {
         return <LearnPage onBackClick={handleBackToMain} />;
+    }
+
+    if (currentPage === 'game') {
+        return <GamePage onBackClick={handleBackToMain} />;
     }
 
     // Default fallback
