@@ -109,7 +109,7 @@
     padding: 4px 12px;
     border-radius: 15px;
     font-family: "Pirata One", serif;
-    font-size: 14px;
+    font-size: 20px;
     text-align: center;
     min-width: 60px;
     border: 2px solid #4a9b8e;
@@ -133,13 +133,31 @@
     transform: translateX(-50%);
     color: white;
     font-family: "Pirata One", serif;
-    font-size: 32px;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 8px 20px;
-    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 12px 24px;
+    border-radius: 12px;
     border: 2px solid #4a9b8e;
+    text-align: center;
+}
+
+.word-language {
+    font-size: 14px;
+    color: #4a9b8e;
+    margin-bottom: 4px;
+}
+
+.word-text {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.word-instruction {
+    font-size: 14px;
+    color: #cccccc;
+    margin-top: 4px;
 }
 
 /* Cannon */
@@ -187,6 +205,117 @@
     }
 }
 
+/* Loading and Error States */
+.loading-display,
+.error-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.loading-text,
+.error-text {
+    color: white;
+    font-family: "Pirata One", serif;
+    font-size: 24px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px 30px;
+    border-radius: 10px;
+    border: 2px solid #4a9b8e;
+}
+
+.retry-button {
+    background-color: #4a9b8e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-family: "Pirata One", serif;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.retry-button:hover {
+    background-color: #5fada0;
+}
+
+/* Hit Feedback */
+.hit-feedback {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Pirata One", serif;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    z-index: 15;
+    animation: feedback-pulse 1s ease-out;
+    text-align: center;
+    max-width: 80vw;
+    word-wrap: break-word;
+}
+
+.hit-feedback.correct {
+    color: #4caf50;
+    text-shadow:
+        3px 3px 6px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.hit-feedback.wrong {
+    color: #f44336;
+    text-shadow:
+        3px 3px 6px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(244, 67, 54, 0.5);
+}
+
+@keyframes feedback-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Destroyed Ships */
+.ship-card.destroyed {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Controls Instructions */
+.controls-instructions {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    color: white;
+    font-family: "Pirata One", serif;
+    font-size: 14px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #4a9b8e;
+}
+
+.controls-instructions div {
+    margin: 2px 0;
+}
+
 /* Back Button */
 .back-button {
     position: absolute;
@@ -225,12 +354,21 @@
     }
 
     .current-word-display {
-        font-size: 24px;
         bottom: 20px;
+        padding: 8px 16px;
+    }
+
+    .word-text {
+        font-size: 28px;
+    }
+
+    .word-language,
+    .word-instruction {
+        font-size: 12px;
     }
 
     .score-display {
-        font-size: 18px;
+        font-size: 16px;
         bottom: 20px;
         left: 20px;
     }
@@ -238,5 +376,20 @@
     .cannon {
         width: 100px;
     }
-}
 
+    .controls-instructions {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .hit-feedback {
+        font-size: 28px;
+        max-width: 90vw;
+    }
+
+    .loading-text,
+    .error-text {
+        font-size: 20px;
+        padding: 15px 20px;
+    }
+}

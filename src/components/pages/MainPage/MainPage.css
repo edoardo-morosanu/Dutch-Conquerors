@@ -1,4 +1,5 @@
-/* MainPage.css */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
 .main-page {
     width: 100vw;
     height: 100vh;
@@ -11,7 +12,8 @@
 }
 
 .background-container {
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
         url("/assets/images/menu_bg.png") center;
     background-size: 115%;
     position: absolute;
@@ -66,21 +68,22 @@
 }
 
 .game-title {
-    font-family: "Arial Black", Arial, sans-serif;
+    font-family: "Cinzel Decorative", serif;
     font-size: 3.5rem;
     font-weight: 900;
     color: #ffffff;
-    text-shadow: 2px 2px 0px #8b4513, 4px 4px 0px #654321,
-        6px 6px 10px rgba(0, 0, 0, 0.8);
     margin: 0;
     text-align: center;
     letter-spacing: 2px;
-    background: linear-gradient(45deg, #ff6b35, #f7931e, #ff6b35);
+    background: linear-gradient(45deg, #ffffff, #e6ffe6, #ccffcc);
     background-size: 400% 400%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradientShift 3s ease-in-out infinite;
+    animation: gradientShift 6s ease-in-out infinite;
+    text-shadow:
+        0 0 2px rgba(0, 0, 0, 0.4),
+        1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes gradientShift {
@@ -107,17 +110,59 @@
     border: 4px solid #654321;
     border-radius: 12px;
     color: #ffffff;
-    font-family: "Arial Black", Arial, sans-serif;
+    font-family: "Cinzel Decorative", Arial, sans-serif;
     font-size: 1.6rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6),
+    box-shadow:
+        0 6px 15px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 rgba(0, 0, 0, 0.3);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.play-button {
+    background: url("/assets/images/play.png") center/cover;
+    border: 4px solid #2a475e;
+}
+
+.play-button:hover {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(52, 81, 104, 0.3),
+            rgba(72, 101, 124, 0.3),
+            rgba(92, 121, 144, 0.3)
+        ),
+        url("/assets/images/play.png") center/cover;
+    border-color: #3a576e;
+}
+
+.learn-button {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(94, 42, 42, 0.3),
+            rgba(114, 62, 62, 0.3),
+            rgba(134, 82, 82, 0.3)
+        ),
+        url("/assets/images/learn.png") center/cover;
+    border: 4px solid #5e2a2a;
+}
+
+.learn-button:hover {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(104, 52, 52, 0.4),
+            rgba(124, 72, 72, 0.4),
+            rgba(144, 92, 92, 0.4)
+        ),
+        url("/assets/images/learn.png") center/cover;
+    border-color: #6e3a3a;
 }
 
 /* Wood texture effect */
@@ -128,34 +173,31 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.1) 2px,
-            rgba(0, 0, 0, 0.1) 4px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 1px,
-            rgba(0, 0, 0, 0.05) 1px,
-            rgba(0, 0, 0, 0.05) 2px
-        );
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    z-index: 0;
+}
+
+.play-button::before {
+    background: rgba(42, 71, 94, 0.1);
+}
+
+.learn-button::before {
+    background: rgba(94, 42, 42, 0.1);
 }
 
 .menu-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7),
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.7),
         inset 0 2px 0 rgba(255, 255, 255, 0.3),
         inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-    border-color: #8b4513;
 }
 
 .menu-button:active {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6),
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.1),
         inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
@@ -163,8 +205,13 @@
 .button-text {
     position: relative;
     z-index: 1;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(0, 0, 0, 0.6);
     letter-spacing: 1px;
+    color: #ffffff;
+    font-weight: 900;
 }
 
 .bottom-buttons {
@@ -188,7 +235,8 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6),
+    box-shadow:
+        0 6px 15px rgba(0, 0, 0, 0.6),
         inset 0 2px 0 rgba(255, 255, 255, 0.2),
         inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
@@ -201,7 +249,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: repeating-linear-gradient(
+    background:
+        repeating-linear-gradient(
             90deg,
             transparent,
             transparent 2px,
@@ -220,7 +269,8 @@
 
 .icon-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7),
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.7),
         inset 0 2px 0 rgba(255, 255, 255, 0.3),
         inset 0 -2px 0 rgba(0, 0, 0, 0.2);
     border-color: #8b4513;
@@ -228,7 +278,8 @@
 
 .icon-button:active {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6),
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.6),
         + inset 0 2px 0 rgba(255, 255, 255, 0.1),
         inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
@@ -296,4 +347,3 @@
         padding: 15px;
     }
 }
-
