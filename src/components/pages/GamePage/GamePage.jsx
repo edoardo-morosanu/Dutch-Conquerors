@@ -16,6 +16,7 @@ const GamePage = ({ onBackClick }) => {
     const [cannonPosition, setCannonPosition] = useState(2);
     const [cannonballs, setCannonballs] = useState([]);
     const [canShoot, setCanShoot] = useState(true);
+    const [correctHitInProgress, setCorrectHitInProgress] = useState(false);
     const [gameTime, setGameTime] = useState(0);
     const [shipsTop, setShipsTop] = useState(60);
     const [isLoading, setIsLoading] = useState(true);
@@ -104,6 +105,8 @@ const GamePage = ({ onBackClick }) => {
         setHitShipIndex(null);
         setLastHitCorrect(null);
         setLifeLost(false);
+        setCorrectHitInProgress(false);
+        setCanShoot(true);
         setupNewWordChallenge();
     };
 
@@ -193,16 +196,21 @@ const GamePage = ({ onBackClick }) => {
 
     // Collision detection function
     const checkCollisions = () => {
+        let correctHitOccurred = false;
+
         cannonballs.forEach((ball) => {
+            if (correctHitOccurred) return; // Skip if correct hit already occurred
+
             const cannonballElement = cannonballRefs.current[ball.id];
             if (!cannonballElement) return;
 
             const ballRect = cannonballElement.getBoundingClientRect();
 
             // Check collision with each ship (only non-destroyed ones)
-            shipWords.forEach((word, shipIndex) => {
-                if (destroyedShips.includes(shipIndex)) return; // Skip destroyed ships
+            for (let shipIndex = 0; shipIndex < shipWords.length; shipIndex++) {
+                if (destroyedShips.includes(shipIndex)) continue; // Skip destroyed ships
 
+                const word = shipWords[shipIndex];
                 const shipWidth = 250;
                 const shipHeight = 150;
                 const shipGap = 40;
@@ -235,11 +243,35 @@ const GamePage = ({ onBackClick }) => {
                             `Correct hit! "${word}" is the translation of "${currentDutchWord}"`,
                         );
 
-                        // Load new word challenge after correct hit
+                        // Clear ALL cannonballs immediately to prevent multiple hits
+                        setCannonballs([]);
+                        // Clear all cannonball refs
+                        Object.keys(cannonballRefs.current).forEach((id) => {
+                            delete cannonballRefs.current[id];
+                        });
+
+                        // Prevent shooting immediately and set flag
+                        setCanShoot(false);
+                        setCorrectHitInProgress(true);
+
+                        // Trigger hit feedback
+                        setHitShipIndex(shipIndex);
                         setTimeout(() => {
-                            setupNewWordChallenge();
-                            setLastHitCorrect(null);
+                            if (!gameOver) setHitShipIndex(null);
+                        }, 500);
+
+                        // Load new word challenge after correct hit
+                        setTimeout(async () => {
+                            if (!gameOver) {
+                                await setupNewWordChallenge();
+                                setLastHitCorrect(null);
+                                setCorrectHitInProgress(false);
+                                setCanShoot(true); // Re-enable shooting when new challenge loads
+                            }
                         }, 1000);
+
+                        correctHitOccurred = true;
+                        return; // Exit collision checking immediately
                     } else {
                         setLastHitCorrect(false);
                         console.log(
@@ -251,7 +283,9 @@ const GamePage = ({ onBackClick }) => {
 
                         // Lose a life for wrong hit
                         setLifeLost(true);
-                        setTimeout(() => setLifeLost(false), 1000);
+                        setTimeout(() => {
+                            if (!gameOver) setLifeLost(false);
+                        }, 1000);
 
                         setLives((prevLives) => {
                             const newLives = prevLives - 1;
@@ -259,31 +293,44 @@ const GamePage = ({ onBackClick }) => {
                                 // Game over - show game over screen
                                 setGameOver(true);
                                 setGameOverReason("No lives remaining!");
+                                // Clear all cannonballs immediately
+                                setCannonballs([]);
+                                Object.keys(cannonballRefs.current).forEach(
+                                    (id) => {
+                                        delete cannonballRefs.current[id];
+                                    },
+                                );
                             }
                             return newLives;
                         });
 
                         setTimeout(() => {
-                            setLastHitCorrect(null);
+                            if (!gameOver) setLastHitCorrect(null);
                         }, 1000);
+
+                        // Trigger hit feedback
+                        setHitShipIndex(shipIndex);
+                        setTimeout(() => {
+                            if (!gameOver) setHitShipIndex(null);
+                        }, 500);
+
+                        // Remove the colliding cannonball
+                        setCannonballs((prev) =>
+                            prev.filter((b) => b.id !== ball.id),
+                        );
+                        delete cannonballRefs.current[ball.id];
                     }
 
-                    // Trigger hit feedback
-                    setHitShipIndex(shipIndex);
-                    setTimeout(() => setHitShipIndex(null), 500);
-
-                    // Remove the colliding cannonball
-                    setCannonballs((prev) =>
-                        prev.filter((b) => b.id !== ball.id),
-                    );
-                    delete cannonballRefs.current[ball.id];
+                    break; // Exit ship checking loop for this cannonball
                 }
-            });
+            }
         });
     };
 
     // Handle cannon movement - only move to non-destroyed ships
     const moveCannon = (direction) => {
+        if (correctHitInProgress || isLoading || gameOver) return;
+
         setCannonPosition((prevPosition) => {
             let newPosition = prevPosition;
 
@@ -311,7 +358,7 @@ const GamePage = ({ onBackClick }) => {
 
     // Handle cannonball shooting
     const shootCannonball = () => {
-        if (!canShoot || isLoading) return;
+        if (!canShoot || isLoading || correctHitInProgress || gameOver) return;
 
         const newCannonball = {
             id: Date.now(),
@@ -324,19 +371,23 @@ const GamePage = ({ onBackClick }) => {
 
         setCanShoot(false);
         setTimeout(() => {
-            setCanShoot(true);
+            if (!gameOver) setCanShoot(true);
         }, 300);
 
         setTimeout(() => {
-            setCannonballs((prev) =>
-                prev.filter((ball) => ball.id !== newCannonball.id),
-            );
-            delete cannonballRefs.current[newCannonball.id];
+            if (!gameOver) {
+                setCannonballs((prev) =>
+                    prev.filter((ball) => ball.id !== newCannonball.id),
+                );
+                delete cannonballRefs.current[newCannonball.id];
+            }
         }, 1500);
     };
 
     // Keyboard event handler
     useEffect(() => {
+        if (gameOver) return; // Don't handle keyboard events when game is over
+
         const handleKeyPress = (event) => {
             switch (event.key) {
                 case "ArrowLeft":
@@ -364,20 +415,29 @@ const GamePage = ({ onBackClick }) => {
         return () => {
             window.removeEventListener("keydown", handleKeyPress);
         };
-    }, [canShoot, cannonPosition, isLoading, destroyedShips]);
+    }, [
+        canShoot,
+        cannonPosition,
+        isLoading,
+        destroyedShips,
+        correctHitInProgress,
+        gameOver,
+    ]);
 
     // Game timer effect
     useEffect(() => {
+        if (gameOver) return; // Don't run timer when game is over
+
         const gameTimer = setInterval(() => {
             setGameTime((prevTime) => prevTime + 0.1);
         }, 100);
 
         return () => clearInterval(gameTimer);
-    }, [gameTime]);
+    }, [gameTime, gameOver]);
 
     // Ship movement effect
     useEffect(() => {
-        if (isLoading) return;
+        if (isLoading || gameOver) return;
 
         const moveShips = () => {
             setShipsTop((prevTop) => {
@@ -394,6 +454,11 @@ const GamePage = ({ onBackClick }) => {
                     // Ships reached bottom - instant game over regardless of lives
                     setGameOver(true);
                     setGameOverReason("Ships reached the harbor!");
+                    // Clear all cannonballs immediately
+                    setCannonballs([]);
+                    Object.keys(cannonballRefs.current).forEach((id) => {
+                        delete cannonballRefs.current[id];
+                    });
                     return newTop; // Keep ships at bottom position
                 }
 
@@ -403,11 +468,11 @@ const GamePage = ({ onBackClick }) => {
 
         const movementInterval = setInterval(moveShips, 16);
         return () => clearInterval(movementInterval);
-    }, [score, isLoading]);
+    }, [score, isLoading, gameOver]);
 
     // Collision detection effect
     useEffect(() => {
-        if (cannonballs.length === 0) return;
+        if (cannonballs.length === 0 || gameOver) return;
 
         const collisionInterval = setInterval(() => {
             checkCollisions();
@@ -421,6 +486,7 @@ const GamePage = ({ onBackClick }) => {
         currentDutchWord,
         shipWords,
         destroyedShips,
+        gameOver,
     ]);
 
     // Initialize game
@@ -433,8 +499,27 @@ const GamePage = ({ onBackClick }) => {
         initializeGame();
     }, []);
 
+    // Handle game over cleanup
+    useEffect(() => {
+        if (gameOver) {
+            // Clear all cannonballs immediately when game ends
+            setCannonballs([]);
+            Object.keys(cannonballRefs.current).forEach((id) => {
+                delete cannonballRefs.current[id];
+            });
+            // Stop any ongoing actions
+            setCanShoot(false);
+            setCorrectHitInProgress(false);
+            setLastHitCorrect(null);
+            setHitShipIndex(null);
+            setLifeLost(false);
+        }
+    }, [gameOver]);
+
     // Auto-adjust cannon position when ships are destroyed
     useEffect(() => {
+        if (gameOver) return; // Don't adjust cannon when game is over
+
         if (destroyedShips.includes(cannonPosition)) {
             // Current position ship is destroyed, find nearest non-destroyed ship
             let nearestIndex = -1;
@@ -454,7 +539,7 @@ const GamePage = ({ onBackClick }) => {
                 setCannonPosition(nearestIndex);
             }
         }
-    }, [destroyedShips, cannonPosition, shipWords]);
+    }, [destroyedShips, cannonPosition, shipWords, gameOver]);
 
     // Calculate cannon position
     const calculateCannonLeft = () => {
