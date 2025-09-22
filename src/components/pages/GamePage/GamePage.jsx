@@ -12,6 +12,7 @@ const GamePage = ({ onBackClick }) => {
     const [shipWords, setShipWords] = useState([]);
     const [correctShipIndex, setCorrectShipIndex] = useState(0);
     const [destroyedShips, setDestroyedShips] = useState([]);
+    const [redBullShips, setRedBullShips] = useState([]);
     const [cannonPosition, setCannonPosition] = useState(2);
     const [cannonballs, setCannonballs] = useState([]);
     const [canShoot, setCanShoot] = useState(true);
@@ -97,6 +98,7 @@ const GamePage = ({ onBackClick }) => {
         setScore(0);
         setLives(3);
         setDestroyedShips([]);
+        setRedBullShips([]);
         setShipsTop(60);
         setCannonballs([]);
         setHitShipIndex(null);
@@ -162,6 +164,16 @@ const GamePage = ({ onBackClick }) => {
             setShipWords(newShipWords.slice(0, 5));
             setCorrectShipIndex(randomCorrectIndex);
             setDestroyedShips([]);
+
+            // Determine which ships should be Red Bull cars (3.3% chance each, ~15% per round)
+            const newRedBullShips = [];
+            for (let i = 0; i < 5; i++) {
+                if (Math.random() < 0.033) {
+                    // 3.3% chance per ship = ~15% chance per round
+                    newRedBullShips.push(i);
+                }
+            }
+            setRedBullShips(newRedBullShips);
 
             // Reset ships position
             setShipsTop(60);
@@ -556,8 +568,16 @@ const GamePage = ({ onBackClick }) => {
                                 }}
                             >
                                 <img
-                                    src="/assets/images/ship.png"
-                                    alt="Ship"
+                                    src={
+                                        redBullShips.includes(index)
+                                            ? "/assets/images/red_bull_car.png"
+                                            : "/assets/images/ship.png"
+                                    }
+                                    alt={
+                                        redBullShips.includes(index)
+                                            ? "Red Bull Racing Car"
+                                            : "Ship"
+                                    }
                                     className="ship-image"
                                 />
                                 <div className="word-label">{word}</div>
