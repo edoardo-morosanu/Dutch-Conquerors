@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import "./MainPage.css";
 import RulesPopup from "../../ui/RulesPopup/RulesPopup";
 
-const MainPage = ({ onPlayClick, onLearnClick }) => {
+const MainPage = ({
+    onPlayClick,
+    onLearnClick,
+    isMuted,
+    musicReady,
+    toggleMute,
+}) => {
     const [showRules, setShowRules] = useState(false);
 
     const handleLearnClick = () => {
@@ -32,14 +38,14 @@ const MainPage = ({ onPlayClick, onLearnClick }) => {
 
                 <div className="menu-buttons">
                     <button
-                        className="menu-button play-button"
+                        className="main-menu-button play-button"
                         onClick={onPlayClick}
                     >
                         <span className="button-text">Play</span>
                     </button>
 
                     <button
-                        className="menu-button learn-button"
+                        className="main-menu-button learn-button"
                         onClick={onLearnClick}
                     >
                         <span className="button-text">Learn</span>
@@ -47,8 +53,14 @@ const MainPage = ({ onPlayClick, onLearnClick }) => {
                 </div>
 
                 <div className="bottom-buttons">
-                    <button className="icon-button mute-button">
-                        <span className="icon">🔇</span>
+                    <button
+                        className="icon-button mute-button"
+                        onClick={toggleMute}
+                        title={isMuted ? "Unmute Music" : "Mute Music"}
+                    >
+                        <span className="icon">
+                            {isMuted ? "🔇" : musicReady ? "🔊" : "⏳"}
+                        </span>
                     </button>
                     <button
                         className="icon-button rules-button"

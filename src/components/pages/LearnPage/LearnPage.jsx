@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./LearnPage.css";
 import wordsData from "../../../data/words.json";
+import translationService from "../../../services/translationService.js";
 
 const LearnPage = ({ onBackClick }) => {
     const [isFlipped, setIsFlipped] = useState(false);
@@ -32,37 +33,9 @@ const LearnPage = ({ onBackClick }) => {
         return wordsCopy.slice(0, count);
     };
 
-    // Function to fetch Dutch translation using Vite proxy
+    // Function to fetch Dutch translation using translation service with fallback
     const fetchWordDetails = async (word) => {
-        try {
-            const response = await fetch("/api/translate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    text: word,
-                    source_lang: "EN",
-                    target_lang: "NL",
-                }),
-            });
-
-            if (!response.ok) {
-                return null; // Skip word if API fails
-            }
-
-            const data = await response.json();
-
-            // Check if translation was successful
-            if (data.code === 200 && data.data) {
-                return data.data;
-            }
-
-            return null; // No translation found
-        } catch (error) {
-            console.error("Error fetching word translation:", error);
-            return null; // Skip word on error
-        }
+        return await translationService.translate(word, "EN", "NL");
     };
 
     // Function to process multiple words in parallel and find ones with Dutch translations

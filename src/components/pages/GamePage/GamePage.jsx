@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./GamePage.css";
 import wordsData from "../../../data/words.json";
+import translationService from "../../../services/translationService.js";
 
 const GamePage = ({ onBackClick }) => {
     const [score, setScore] = useState(0);
+    const [lives, setLives] = useState(3);
 
     const [currentDutchWord, setCurrentDutchWord] = useState("");
     const [currentEnglishWord, setCurrentEnglishWord] = useState("");
@@ -21,6 +23,9 @@ const GamePage = ({ onBackClick }) => {
     const cannonballRefs = useRef({});
     const [hitShipIndex, setHitShipIndex] = useState(null);
     const [lastHitCorrect, setLastHitCorrect] = useState(null);
+    const [gameOver, setGameOver] = useState(false);
+    const [gameOverReason, setGameOverReason] = useState("");
+    const [lifeLost, setLifeLost] = useState(false);
 
     // Function to get multiple random English words from local JSON data
     const getRandomWords = (count = 10) => {
@@ -35,36 +40,9 @@ const GamePage = ({ onBackClick }) => {
         return wordsCopy.slice(0, count);
     };
 
-    // Function to fetch Dutch translation using DeepLX API
+    // Function to fetch Dutch translation using translation service with fallback
     const fetchDutchTranslation = async (word) => {
-        try {
-            const response = await fetch("/api/translate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    text: word,
-                    source_lang: "EN",
-                    target_lang: "NL",
-                }),
-            });
-
-            if (!response.ok) {
-                return null;
-            }
-
-            const data = await response.json();
-
-            if (data.code === 200 && data.data) {
-                return data.data;
-            }
-
-            return null;
-        } catch (error) {
-            console.error("Error fetching translation:", error);
-            return null;
-        }
+        return await translationService.translate(word, "EN", "NL");
     };
 
     // Function to process words and find ones with Dutch translations
@@ -110,6 +88,21 @@ const GamePage = ({ onBackClick }) => {
         } catch (error) {
             console.error("Error loading words into queue:", error);
         }
+    };
+
+    // Function to restart the game completely
+    const restartGame = () => {
+        setGameOver(false);
+        setGameOverReason("");
+        setScore(0);
+        setLives(3);
+        setDestroyedShips([]);
+        setShipsTop(60);
+        setCannonballs([]);
+        setHitShipIndex(null);
+        setLastHitCorrect(null);
+        setLifeLost(false);
+        setupNewWordChallenge();
     };
 
     // Function to setup a new word challenge
@@ -244,6 +237,20 @@ const GamePage = ({ onBackClick }) => {
                         // Destroy the wrong ship
                         setDestroyedShips((prev) => [...prev, shipIndex]);
 
+                        // Lose a life for wrong hit
+                        setLifeLost(true);
+                        setTimeout(() => setLifeLost(false), 1000);
+
+                        setLives((prevLives) => {
+                            const newLives = prevLives - 1;
+                            if (newLives <= 0) {
+                                // Game over - show game over screen
+                                setGameOver(true);
+                                setGameOverReason("No lives remaining!");
+                            }
+                            return newLives;
+                        });
+
                         setTimeout(() => {
                             setLastHitCorrect(null);
                         }, 1000);
@@ -372,9 +379,10 @@ const GamePage = ({ onBackClick }) => {
                 const newTop = prevTop + currentSpeed;
 
                 if (newTop >= bottomBoundary) {
-                    // Ships reached bottom - load new challenge
-                    setTimeout(() => setupNewWordChallenge(), 0);
-                    return 60;
+                    // Ships reached bottom - instant game over regardless of lives
+                    setGameOver(true);
+                    setGameOverReason("Ships reached the harbor!");
+                    return newTop; // Keep ships at bottom position
                 }
 
                 return newTop;
@@ -461,13 +469,52 @@ const GamePage = ({ onBackClick }) => {
     return (
         <div className="game-page">
             <div className="game-background">
-                {/* Score Display */}
+                {/* Score and Lives Display */}
                 <div className="score-display">
                     <div>
                         <span className="score-label">Score:</span>{" "}
                         <span className="score-value">{score}</span>
                     </div>
+                    <div style={{ marginLeft: "20px" }}>
+                        <span className="score-label">Lives:</span>{" "}
+                        <span
+                            className={`score-value ${lifeLost ? "life-lost-flash" : ""}`}
+                        >
+                            {"❤️".repeat(lives)}
+                            {"🖤".repeat(Math.max(0, 3 - lives))}
+                        </span>
+                    </div>
                 </div>
+
+                {/* Game Over Screen */}
+                {gameOver && (
+                    <div className="game-over-overlay">
+                        <div className="game-over-message">
+                            <h1>Game Over!</h1>
+                            <p className="game-over-reason">{gameOverReason}</p>
+                            <div className="game-over-stats">
+                                <p>
+                                    Final Score:{" "}
+                                    <span className="final-score">{score}</span>
+                                </p>
+                            </div>
+                            <div className="game-over-buttons">
+                                <button
+                                    className="restart-button"
+                                    onClick={restartGame}
+                                >
+                                    Play Again
+                                </button>
+                                <button
+                                    className="menu-button"
+                                    onClick={onBackClick}
+                                >
+                                    Back to Menu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Hit Feedback */}
                 {lastHitCorrect !== null && (
@@ -556,12 +603,6 @@ const GamePage = ({ onBackClick }) => {
                         />
                     </div>
                 ))}
-
-                {/* Controls Instructions */}
-                <div className="controls-instructions">
-                    <div>Use ← → arrow keys or A/D to move</div>
-                    <div>Press SPACE to shoot</div>
-                </div>
 
                 {/* Back Button */}
                 <button className="back-button" onClick={onBackClick}>
