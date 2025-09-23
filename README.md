@@ -1,243 +1,220 @@
-# Phaser React Template
+# Dutch Conquerors 🏴‍☠️⚓
 
-This is a Phaser 3 project template that uses the React framework and Vite for bundling. It includes a bridge for React to Phaser game communication, hot-reloading for quick development workflow and scripts to generate production-ready builds.
+A React-based educational maritime arcade game that combines Dutch language learning with retro-style gameplay. Inspired by classic Space Invaders mechanics, players must match Dutch and English vocabulary while defending against enemy ships in an immersive nautical setting.
 
-**[This Template is also available as a TypeScript version.](https://github.com/phaserjs/template-react-ts)**
+<img src="public/assets/images/logo.png" alt="Game Screenshot" width="150px"/>
 
-### Versions
+## 🎯 Overview
 
-This template has been updated for:
+Dutch Conquerors transforms vocabulary learning into an engaging arcade experience. Players control a cannon ship at the bottom of the screen, shooting at enemy vessels while matching Dutch words with their English translations. The game features both an action-packed gameplay mode and a relaxed flashcard learning mode.
 
-- [Phaser 3.90.0](https://github.com/phaserjs/phaser)
-- [React 19.0.0](https://github.com/facebook/react)
-- [Vite 6.3.1](https://github.com/vitejs/vite)
+### Key Features
 
-![screenshot](screenshot.png)
+- **Maritime Arcade Gameplay**: Classic ship-to-ship combat with educational twist
+- **Dual Learning Modes**: 
+  - Game Mode: Fast-paced vocabulary matching during combat
+  - Learn Mode: Interactive flashcard system with swipe mechanics
+- **Dynamic Translation System**: Multiple API integrations with intelligent fallbacks
+- **Immersive Audio**: Background music
+- **Progressive Difficulty**: Enemy ship speed increases with score
 
-## Requirements
+## 🚀 Quick Start
 
-[Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
+### Prerequisites
 
-## Available Commands
+- Node.js (v18 or higher)
+- npm or yarn package manager
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/edoardo-morosanu/Dutch-Conquerors.git
+   cd dutch-conquerors
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:8080`
+
+### Production Build
+
+```bash
+npm run build
+```
+
+The built files will be available in the `dist/` directory.
+
+## 🎮 How to Play
+
+### Game Mode
+1. **Objective**: Destroy enemy ships by shooting the correct English translation of the displayed Dutch word
+2. **Controls**: 
+   - Use keyboard arrows or on-screen controls to move your cannon
+   - Click or press spacebar to fire cannonballs
+3. **Scoring**: Earn points for correct hits, lose lives for wrong answers or missed ships
+4. **Special Enemies**: Watch out for Red Bull ships with bonus challenges!
+
+### Learn Mode
+1. **Flashcard Learning**: Swipe through vocabulary cards at your own pace
+2. **Interactive Cards**: Tap to flip between Dutch and English
+3. **Gesture Controls**: Swipe left/right to navigate between words
+4. **Audio Support**: Text-to-speech functionality for pronunciation practice
+
+## 🏗️ Project Structure
+
+```
+dutch-conquerors/
+├── public/
+│   ├── assets/
+│   │   ├── images/          # Game sprites and UI images
+│   │   └── music/           # Background music files
+│   ├── favicon.png
+│   └── style.css           # Global styles
+├── src/
+│   ├── components/
+│   │   ├── pages/
+│   │   │   ├── MainPage/    # Landing page with menu
+│   │   │   ├── GamePage/    # Main arcade gameplay
+│   │   │   └── LearnPage/   # Flashcard learning mode
+│   │   └── ui/              # Reusable UI components
+│   ├── data/
+│   │   └── words.json       # Local vocabulary database
+│   ├── services/
+│   │   └── translationService.js  # Translation API management
+│   ├── App.jsx              # Main application component
+│   └── main.jsx             # React entry point
+├── config/
+│   ├── config.dev.mjs       # Development configuration
+│   └── config.prod.mjs      # Production configuration
+└── package.json
+```
+
+## 🔧 Technical Implementation
+
+### Frontend Stack
+- **React 19**: Component-based UI framework
+- **Vite**: Modern build tool and development server
+- **CSS3**: Custom styling with animations and responsive design
+- **JavaScript ES6+**: Modern JavaScript features
+
+### Translation Services
+The game implements a robust translation system with multiple fallback layers:
+
+1. **Primary**: DeepL API via proxy server
+2. **Secondary**: Google Translate API with CORS handling
+3. **Fallback**: Local dictionary with 60+ maritime and common terms
+
+### API Integration
+```javascript
+// Translation service with intelligent fallbacks
+const translationService = {
+  translate: async (text, sourceLang, targetLang) => {
+    // Try DeepL → Google Translate → Local Dictionary
+  }
+}
+```
+
+### Game Engine
+- Custom collision detection system
+- Real-time scoring and life management
+- Dynamic difficulty scaling
+- Responsive canvas-based rendering
+
+## 🌐 Development Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm install` | Install project dependencies |
-| `npm run dev` | Launch a development web server |
-| `npm run build` | Create a production build in the `dist` folder |
-| `npm run dev-nolog` | Launch a development web server without sending anonymous data (see "About log.js" below) |
-| `npm run build-nolog` | Create a production build in the `dist` folder without sending anonymous data (see "About log.js" below) |
+| `npm run dev` | Start development server with logging |
+| `npm run build` | Create production build |
+| `npm run dev-nolog` | Start development server without logging |
+| `npm run build-nolog` | Create production build without logging |
 
-## Writing Code
+## 🎨 Customization
 
-After cloning the repo, run `npm install` from your project directory. Then, you can start the local development server by running `npm run dev`.
-
-The local development server runs on `http://localhost:8080` by default. Please see the Vite documentation if you wish to change this, or add SSL support.
-
-Once the server is running you can edit any of the files in the `src` folder. Vite will automatically recompile your code and then reload the browser.
-
-## Template Project Structure
-
-We have provided a default project structure to get you started. This is as follows:
-
-| Path                          | Description                                                                 |
-|-------------------------------|-----------------------------------------------------------------------------|
-| `index.html`                  | A basic HTML page to contain the game.                                     |
-| `src`                         | Contains the React client source code.                                     |
-| `src/main.jsx`                | The main **React** entry point. This bootstraps the React application.      |
-| `src/App.jsx`                 | The main React component.                                                  |
-| `src/PhaserGame.jsx`          | The React component that initializes the Phaser Game and serves as a bridge between React and Phaser. |
-| `src/game/EventBus.js`        | A simple event bus to communicate between React and Phaser.                |
-| `src/game`                    | Contains the game source code.                                             |
-| `src/game/main.jsx`           | The main **game** entry point. This contains the game configuration and starts the game. |
-| `src/game/scenes/`            | The Phaser Scenes are in this folder.                                      |
-| `public/style.css`            | Some simple CSS rules to help with page layout.                            |
-| `public/assets`               | Contains the static assets used by the game.                               |
-
-## React Bridge
-
-The `PhaserGame.jsx` component is the bridge between React and Phaser. It initializes the Phaser game and passes events between the two.
-
-To communicate between React and Phaser, you can use the **EventBus.js** file. This is a simple event bus that allows you to emit and listen for events from both React and Phaser.
-
-```js
-// In React
-import { EventBus } from './EventBus';
-
-// Emit an event
-EventBus.emit('event-name', data);
-
-// In Phaser
-// Listen for an event
-EventBus.on('event-name', (data) => {
-    // Do something with the data
-});
-```
-
-In addition to this, the `PhaserGame` component exposes the Phaser game instance along with the most recently active Phaser Scene using React forwardRef.
-
-Once exposed, you can access them like any regular react reference.
-
-## Phaser Scene Handling
-
-In Phaser, the Scene is the lifeblood of your game. It is where you sprites, game logic and all of the Phaser systems live. You can also have multiple scenes running at the same time. This template provides a way to obtain the current active scene from React.
-
-You can get the current Phaser Scene from the component event `"current-active-scene"`. In order to do this, you need to emit the event `"current-scene-ready"` from the Phaser Scene class. This event should be emitted when the scene is ready to be used. You can see this done in all of the Scenes in our template.
-
-**Important**: When you add a new Scene to your game, make sure you expose to React by emitting the `"current-scene-ready"` event via the `EventBus`, like this:
-
-
-```js
-class MyScene extends Phaser.Scene
-{
-    constructor ()
-    {
-        super('MyScene');
-    }
-
-    create ()
-    {
-        // Your Game Objects and logic here
-
-        // At the end of create method:
-        EventBus.emit('current-scene-ready', this);
-    }
-}
-```
-
-You don't have to emit this event if you don't need to access the specific scene from React. Also, you don't have to emit it at the end of `create`, you can emit it at any point. For example, should your Scene be waiting for a network request or API call to complete, it could emit the event once that data is ready.
-
-### React Component Example
-
-Here's an example of how to access Phaser data for use in a React Component:
-
-```js
-import { useRef } from 'react';
-
-// In a parent component
-const ReactComponent = () => {
-
-    const phaserRef = useRef(); // you can access to this ref from phaserRef.current
-
-    const onCurrentActiveScene = (scene) => {
-    
-        // This is invoked
-
-    }
-
-    return (
-        ...
-        <PhaserGame ref={phaserRef} currentActiveScene={onCurrentActiveScene} />
-        ...
-    );
-
-}
-```
-
-In the code above, you can get a reference to the current Phaser Game instance and the current Scene by creating a reference with `useRef()` and assign to PhaserGame component.
-
-From this state reference, the game instance is available via `phaserRef.current.game` and the most recently active Scene via `phaserRef.current.scene`.
-
-The `onCurrentActiveScene` callback will also be invoked whenever the the Phaser Scene changes, as long as you emit the event via the EventBus, as outlined above.
-
-## Handling Assets
-
-Vite supports loading assets via JavaScript module `import` statements.
-
-This template provides support for both embedding assets and also loading them from a static folder. To embed an asset, you can import it at the top of the JavaScript file you are using it in:
-
-```js
-import logoImg from './assets/logo.png'
-```
-
-To load static files such as audio files, videos, etc place them into the `public/assets` folder. Then you can use this path in the Loader calls within Phaser:
-
-```js
-preload ()
-{
-    //  This is an example of an imported bundled image.
-    //  Remember to import it at the top of this file
-    this.load.image('logo', logoImg);
-
-    //  This is an example of loading a static image
-    //  from the public/assets folder:
-    this.load.image('background', 'assets/bg.png');
-}
-```
-
-When you issue the `npm run build` command, all static assets are automatically copied to the `dist/assets` folder.
-
-## Deploying to Production
-
-After you run the `npm run build` command, your code will be built into a single bundle and saved to the `dist` folder, along with any other assets your project imported, or stored in the public assets folder.
-
-In order to deploy your game, you will need to upload *all* of the contents of the `dist` folder to a public facing web server.
-
-## Customizing the Template
-
-### Vite
-
-If you want to customize your build, such as adding plugin (i.e. for loading CSS or fonts), you can modify the `vite/config.*.mjs` file for cross-project changes, or you can modify and/or create new configuration files and target them in specific npm tasks inside of `package.json`. Please see the [Vite documentation](https://vitejs.dev/) for more information.
-
-## About log.js
-
-If you inspect our node scripts you will see there is a file called `log.js`. This file makes a single silent API call to a domain called `gryzor.co`. This domain is owned by Phaser Studio Inc. The domain name is a homage to one of our favorite retro games.
-
-We send the following 3 pieces of data to this API: The name of the template being used (vue, react, etc). If the build was 'dev' or 'prod' and finally the version of Phaser being used.
-
-At no point is any personal data collected or sent. We don't know about your project files, device, browser or anything else. Feel free to inspect the `log.js` file to confirm this.
-
-Why do we do this? Because being open source means we have no visible metrics about which of our templates are being used. We work hard to maintain a large and diverse set of templates for Phaser developers and this is our small anonymous way to determine if that work is actually paying off, or not. In short, it helps us ensure we're building the tools for you.
-
-However, if you don't want to send any data, you can use these commands instead:
-
-Dev:
-
-```bash
-npm run dev-nolog
-```
-
-Build:
-
-```bash
-npm run build-nolog
-```
-
-Or, to disable the log entirely, simply delete the file `log.js` and remove the call to it in the `scripts` section of `package.json`:
-
-Before:
-
+### Adding New Vocabulary
+Edit `src/data/words.json` to add new English words:
 ```json
-"scripts": {
-    "dev": "node log.js dev & dev-template-script",
-    "build": "node log.js build & build-template-script"
-},
+[
+  "ship",
+  "anchor",
+  "treasure",
+  // Add your words here
+]
 ```
 
-After:
+### Translation Configuration
+Modify `src/services/translationService.js` to:
+- Add new API endpoints
+- Extend local dictionary
+- Configure CORS proxies
 
-```json
-"scripts": {
-    "dev": "dev-template-script",
-    "build": "build-template-script"
-},
-```
+### Styling and Themes
+- Global styles: `public/style.css`
+- Component styles: Individual `.css` files in component directories
+- Assets: `public/assets/` for images and audio
 
-Either of these will stop `log.js` from running. If you do decide to do this, please could you at least join our Discord and tell us which template you're using! Or send us a quick email. Either will be super-helpful, thank you.
+## 🧪 Educational Design
 
-## Join the Phaser Community!
+### Learning Principles
+- **Gamification**: Points, lives, and progression to maintain engagement
+- **Spaced Repetition**: Flashcard mode for vocabulary reinforcement
+- **Contextual Learning**: Maritime theme provides memorable word associations
+- **Multi-modal Input**: Visual, auditory, and kinesthetic learning support
 
-We love to see what developers like you create with Phaser! It really motivates us to keep improving. So please join our community and show-off your work 😄
+### Target Audience
+- **Language Learners**: Beginner to intermediate Dutch students
+- **Students**: High school and university learners
+- **Expats**: Adults needing practical Dutch vocabulary
+- **Gaming Enthusiasts**: Retro arcade game fans
 
-**Visit:** The [Phaser website](https://phaser.io) and follow on [Phaser Twitter](https://twitter.com/phaser_)<br />
-**Play:** Some of the amazing games [#madewithphaser](https://twitter.com/search?q=%23madewithphaser&src=typed_query&f=live)<br />
-**Learn:** [API Docs](https://newdocs.phaser.io), [Support Forum](https://phaser.discourse.group/) and [StackOverflow](https://stackoverflow.com/questions/tagged/phaser-framework)<br />
-**Discord:** Join us on [Discord](https://discord.gg/phaser)<br />
-**Code:** 2000+ [Examples](https://labs.phaser.io)<br />
-**Read:** The [Phaser World](https://phaser.io/community/newsletter) Newsletter<br />
+## 🔒 Browser Compatibility
 
-Created by [Phaser Studio](mailto:support@phaser.io). Powered by coffee, anime, pixels and love.
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-The Phaser logo and characters are &copy; 2011 - 2025 Phaser Studio Inc.
+## 🤝 Contributing
 
-All rights reserved.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow React best practices
+- Maintain consistent code formatting with ESLint
+- Test new vocabulary additions thoroughly
+- Ensure responsive design compatibility
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Maritime History**: Inspired by Dutch Golden Age naval exploration
+- **Game Design**: Classic Space Invaders mechanics adapted for education
+- **Translation APIs**: DeepL and Google Translate for dynamic vocabulary
+- **Community**: Open source contributors and language learning enthusiasts
+
+## 📧 Contact
+
+**Author**: Edoardo Andrei Morosanu  
+**Repository**: [Dutch Conquerors on GitHub](https://github.com/edoardo-morosanu/Dutch-Conquerors)  
+**Issues**: [Report bugs or request features](https://github.com/edoardo-morosanu/Dutch-Conquerors/issues)
+
+---
+
+*Ahoy! Set sail on your Dutch learning adventure with the Dutch Conquerors! ⚓🇳🇱*

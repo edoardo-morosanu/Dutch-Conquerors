@@ -1,0 +1,343 @@
+.learn-tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    pointer-events: auto;
+}
+
+.learn-tutorial-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease-out;
+    pointer-events: auto;
+    cursor: not-allowed;
+}
+
+.learn-tutorial-clickable-area {
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.learn-tutorial-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #2a4a5c, #1e3a4a);
+    border: 3px solid #4a9b8e;
+    border-radius: 20px;
+    padding: 25px;
+    width: 600px;
+    height: 500px;
+    color: white;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        inset 0 2px 0 rgba(255, 255, 255, 0.1);
+    animation: slideIn 0.4s ease-out;
+    pointer-events: auto;
+    z-index: 10002;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.learn-tutorial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(74, 155, 142, 0.3);
+    padding-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.learn-tutorial-title {
+    font-size: 24px;
+    margin: 0;
+    color: #4a9b8e;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.learn-tutorial-progress {
+    font-size: 14px;
+    color: #cccccc;
+    background: rgba(74, 155, 142, 0.2);
+    padding: 4px 12px;
+    border-radius: 15px;
+    border: 1px solid rgba(74, 155, 142, 0.4);
+}
+
+.learn-tutorial-body {
+    margin-bottom: 15px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.learn-tutorial-description {
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 0 0 15px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.learn-tutorial-button-text {
+    font-size: 16px;
+    color: #a0d4cc;
+    margin: 0;
+    font-style: italic;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.learn-tutorial-actions {
+    margin-bottom: 15px;
+    margin-top: auto;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.learn-tutorial-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    min-width: 100px;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #cccccc;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.back-btn:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.back-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.skip-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #cccccc;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.skip-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.next-btn {
+    background: linear-gradient(145deg, #4a9b8e, #5fada0);
+    color: white;
+    border: 2px solid #4a9b8e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.next-btn:hover {
+    background: linear-gradient(145deg, #5fada0, #74c2b5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.next-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.learn-tutorial-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: #4a9b8e;
+    border-color: #4a9b8e;
+    box-shadow: 0 0 10px rgba(74, 155, 142, 0.6);
+}
+
+.indicator.completed {
+    background: #74c2b5;
+    border-color: #74c2b5;
+}
+
+.indicator:hover {
+    transform: scale(1.1);
+    border-width: 3px;
+}
+
+/* Arrow pointer */
+.tutorial-arrow {
+    font-size: 72px;
+    color: #4a9b8e;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: bounce 2s infinite;
+    pointer-events: none;
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .learn-tutorial-content {
+        width: 90vw;
+        height: 80vh;
+        padding: 25px 20px;
+        margin: 20px;
+    }
+
+    .learn-tutorial-title {
+        font-size: 20px;
+    }
+
+    .learn-tutorial-description {
+        font-size: 16px;
+    }
+
+    .learn-tutorial-button-text {
+        font-size: 14px;
+    }
+
+    .learn-tutorial-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+        min-width: 80px;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 480px) {
+    .learn-tutorial-content {
+        width: 95vw;
+        height: 85vh;
+        padding: 20px 15px;
+    }
+
+    .learn-tutorial-title {
+        font-size: 18px;
+    }
+
+    .learn-tutorial-description {
+        font-size: 14px;
+    }
+
+    .learn-tutorial-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-width: 70px;
+    }
+
+    .tutorial-arrow {
+        font-size: 54px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .learn-tutorial-content {
+        border: 4px solid white;
+        background: #000000;
+    }
+
+    .skip-btn {
+        border: 3px solid white;
+        background: #333333;
+    }
+
+    .next-btn {
+        border: 3px solid #4a9b8e;
+        background: #2d5a52;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .learn-tutorial-backdrop,
+    .learn-tutorial-content {
+        animation: none;
+    }
+
+    .learn-tutorial-btn,
+    .indicator {
+        transition: none;
+    }
+
+    .next-btn:hover {
+        transform: none;
+    }
+}
