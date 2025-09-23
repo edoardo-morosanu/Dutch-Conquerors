@@ -1,103 +1,54 @@
 import React, { useState, useEffect } from "react";
-import "./FirstPopup.css";
+import "./LearnTutorial.css";
 
-const FirstPopup = ({ isOpen, onComplete }) => {
+const LearnTutorial = ({ isOpen, onComplete }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
 
     const steps = [
         {
-            id: "music",
-            title: "Background Music",
-            description: "Background music is muted by default.",
-            buttonText: "You can turn it on anytime using this button",
-            highlightSelector: ".mute-button",
-            position: "center",
-        },
-        {
-            id: "game-rules",
-            title: "Game Rules",
-            description: "Learn the basics of Dutch Conquerors naval combat!",
-            buttonText: null,
-            highlightSelector: null,
-            position: "center",
-            content: (
-                <div className="tutorial-rules-content">
-                    <div className="maritime-section">
-                        <div className="section-anchor">⚓</div>
-                        <h4 className="section-title">Mission Objectives</h4>
-                        <ul className="maritime-list">
-                            <li>
-                                Target the ship with the correct English
-                                translation of the Dutch word displayed
-                            </li>
-                            <li>
-                                Achieve high scores by conquering enemy fleets
-                            </li>
-                            <li>
-                                Monitor your ship's health - three strikes and
-                                you're out!
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            ),
-        },
-        {
-            id: "game-controls",
-            title: "Ship Controls",
+            id: "flashcard",
+            title: "Flashcard Learning",
             description:
-                "Master these controls to command your vessel effectively.",
-            buttonText: null,
+                "Welcome to the flashcard learning mode! Here you can practice Dutch vocabulary.",
+            buttonText: "Click on any card to see the translation",
+            highlightSelector: ".flashcard",
+            position: "center",
+        },
+        {
+            id: "swipe-right",
+            title: "Building Your Wordlist",
+            description:
+                "Swipe cards to the right to add words to your personal wordlist.",
+            buttonText: "These words will be saved for later use",
             highlightSelector: null,
             position: "center",
-            content: (
-                <div className="tutorial-controls-content">
-                    <div className="controls-map">
-                        <div className="control-entry">
-                            <div className="nautical-key">A D / ← →</div>
-                            <div className="control-description">
-                                <span className="control-name">
-                                    Cannon Positioning
-                                </span>
-                                <span className="control-detail">
-                                    Navigate your cannon left and right
-                                </span>
-                            </div>
-                        </div>
-                        <div className="control-entry">
-                            <div className="nautical-key">SPACE</div>
-                            <div className="control-description">
-                                <span className="control-name">
-                                    Fire Cannon
-                                </span>
-                                <span className="control-detail">
-                                    Launch cannonball at target vessel
-                                </span>
-                            </div>
-                        </div>
-                        <div className="control-entry">
-                            <div className="nautical-key">ESC</div>
-                            <div className="control-description">
-                                <span className="control-name">
-                                    Pause Orders
-                                </span>
-                                <span className="control-detail">
-                                    Halt battle and access menu
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ),
+        },
+        {
+            id: "game-mode",
+            title: "Game Mode Selection",
+            description:
+                "In the game, you'll be able to choose between playing with all words or only your wordlist!",
+            buttonText: "This lets you focus on words you want to practice",
+            highlightSelector: null,
+            position: "center",
+        },
+        {
+            id: "swipe-left",
+            title: "Skipping Words",
+            description:
+                "Swipe cards to the left if you don't want to add them to your wordlist.",
+            buttonText: "You can always encounter these words again later",
+            highlightSelector: null,
+            position: "center",
         },
         {
             id: "replay-info",
             title: "Tutorial Replay",
             description: "You can replay this tutorial anytime!",
             buttonText:
-                "Click the rules button (highlighted with an arrow) to replay this tutorial",
-            highlightSelector: ".rules-button",
+                "Click the tutorial button (highlighted with an arrow) in the top right to replay this tutorial",
+            highlightSelector: ".replay-tutorial-button",
             position: "center",
             showArrow: true,
         },
@@ -170,12 +121,12 @@ const FirstPopup = ({ isOpen, onComplete }) => {
 
     return (
         <div
-            className="first-popup-overlay"
+            className="learn-tutorial-overlay"
             onClick={(e) => e.stopPropagation()}
         >
-            {/* Single overlay with cutout for highlighted button */}
+            {/* Single overlay with cutout for highlighted element */}
             <div
-                className="first-popup-backdrop"
+                className="learn-tutorial-backdrop"
                 onClick={(e) => e.stopPropagation()}
                 style={
                     highlightPos
@@ -186,24 +137,25 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                 }
             />
 
-            {/* Arrow pointing to highlighted element */}
+            {/* Arrow pointing from tutorial to highlighted element */}
             {highlightPos && currentStepData.showArrow && (
                 <div
                     className="tutorial-arrow"
                     style={{
                         position: "absolute",
-                        top: highlightPos.top - 80,
+                        top: highlightPos.top + highlightPos.height + 30,
                         left: highlightPos.left + highlightPos.width / 2 - 36,
                         zIndex: 10004,
                     }}
                 >
-                    ↓
+                    ↑
                 </div>
             )}
+
             {/* Make highlighted element clickable */}
             {highlightPos && (
                 <div
-                    className="first-popup-clickable-area"
+                    className="learn-tutorial-clickable-area"
                     style={{
                         position: "absolute",
                         top: highlightPos.top,
@@ -219,7 +171,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                         const element = getHighlightedElement();
                         if (element) {
                             element.click();
-                            // If user clicks rules button in final step, complete tutorial
+                            // If user clicks replay button in final step, complete tutorial
                             if (
                                 currentStep === steps.length - 1 &&
                                 steps[currentStep].id === "replay-info"
@@ -230,41 +182,36 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                     }}
                 />
             )}
+
             {/* Tutorial content */}
-            <div className="first-popup-content">
-                <div className="first-popup-header">
-                    <h2 className="first-popup-title">
+            <div className="learn-tutorial-content">
+                <div className="learn-tutorial-header">
+                    <h2 className="learn-tutorial-title">
                         {currentStepData.title}
                     </h2>
-                    <div className="first-popup-progress">
+                    <div className="learn-tutorial-progress">
                         <span>
                             {currentStep + 1} of {steps.length}
                         </span>
                     </div>
                 </div>
 
-                <div className="first-popup-body">
-                    <p className="first-popup-description">
+                <div className="learn-tutorial-body">
+                    <p className="learn-tutorial-description">
                         {currentStepData.description}
                     </p>
 
-                    {currentStepData.content && (
-                        <div className="tutorial-step-content">
-                            {currentStepData.content}
-                        </div>
-                    )}
-
                     {currentStepData.buttonText && (
-                        <p className="first-popup-button-text">
+                        <p className="learn-tutorial-button-text">
                             {currentStepData.buttonText}
                         </p>
                     )}
                 </div>
 
-                <div className="first-popup-actions">
+                <div className="learn-tutorial-actions">
                     <div className="navigation-buttons">
                         <button
-                            className={`first-popup-btn back-btn ${isFirstStep ? "disabled" : ""}`}
+                            className={`learn-tutorial-btn back-btn ${isFirstStep ? "disabled" : ""}`}
                             onClick={handlePrevious}
                             disabled={isFirstStep}
                         >
@@ -272,14 +219,14 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                         </button>
 
                         <button
-                            className="first-popup-btn skip-btn"
+                            className="learn-tutorial-btn skip-btn"
                             onClick={handleSkip}
                         >
                             Skip Tutorial
                         </button>
 
                         <button
-                            className="first-popup-btn next-btn"
+                            className="learn-tutorial-btn next-btn"
                             onClick={handleNext}
                         >
                             {isLastStep ? "Got it!" : "Next →"}
@@ -288,7 +235,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                 </div>
 
                 {/* Step indicators */}
-                <div className="first-popup-indicators">
+                <div className="learn-tutorial-indicators">
                     {steps.map((_, index) => (
                         <div
                             key={index}
@@ -304,4 +251,4 @@ const FirstPopup = ({ isOpen, onComplete }) => {
     );
 };
 
-export default FirstPopup;
+export default LearnTutorial;

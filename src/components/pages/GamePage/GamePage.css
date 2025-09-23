@@ -15,13 +15,75 @@
     position: relative;
 }
 
+/* Replay tutorial button */
+.replay-tutorial-button {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    background: linear-gradient(145deg, #4a9b8e, #5fada0);
+    color: white;
+    border: 2px solid #4a9b8e;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition:
+        all 0.3s ease,
+        opacity 1s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    opacity: 1;
+    animation: tutorialButtonFadeIn 0.5s ease-in;
+    width: auto;
+    min-width: 120px;
+    max-width: 200px;
+    white-space: nowrap;
+}
+
+.replay-tutorial-button.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.replay-tutorial-button:hover {
+    background: linear-gradient(145deg, #5fada0, #74c2b5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.replay-tutorial-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.replay-tutorial-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+@keyframes tutorialButtonFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Score Display */
 .score-display {
     position: absolute;
     bottom: 30px;
     left: 30px;
     color: white;
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 24px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     z-index: 10;
@@ -114,7 +176,7 @@
     color: white;
     padding: 4px 12px;
     border-radius: 15px;
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 20px;
     text-align: center;
     min-width: 60px;
@@ -138,7 +200,7 @@
     left: 50%;
     transform: translateX(-50%);
     color: white;
-    font-family: "Cinzel Decorative", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.8);
@@ -225,7 +287,7 @@
 .loading-text,
 .error-text {
     color: white;
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 24px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     background-color: rgba(0, 0, 0, 0.7);
@@ -240,7 +302,7 @@
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 16px;
     cursor: pointer;
     margin-top: 15px;
@@ -256,7 +318,7 @@
     top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 48px;
     font-weight: bold;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
@@ -312,7 +374,7 @@
     border: 2px solid #4a9b8e;
     padding: 10px 20px;
     border-radius: 25px;
-    font-family: "Pirata One", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     font-size: 16px;
     cursor: pointer;
     z-index: 10;
@@ -322,111 +384,327 @@
     background-color: #4a9b8e;
 }
 
-/* Game Over Screen */
+/* Nautical Game Over Screen - Shipwreck Theme */
 .game-over-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.9);
+    background:
+        radial-gradient(
+            ellipse at center bottom,
+            rgba(21, 67, 96, 0.9) 0%,
+            rgba(44, 62, 80, 0.95) 50%,
+            rgba(0, 0, 0, 0.98) 100%
+        ),
+        linear-gradient(0deg, rgba(21, 67, 96, 0.3) 0%, transparent 50%);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
-    animation: fade-in 0.5s ease-in;
+    animation: shipwreckFadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes shipwreckFadeIn {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
 }
 
 .game-over-message {
     text-align: center;
-    color: white;
-    font-family: "Pirata One", serif;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
-    background-color: rgba(244, 67, 54, 0.9);
-    padding: 40px 60px;
-    border-radius: 20px;
-    border: 3px solid #f44336;
-    box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
-    max-width: 500px;
+    color: #ecf0f1;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.9);
+    background: linear-gradient(
+        135deg,
+        rgba(52, 73, 94, 0.95) 0%,
+        rgba(44, 62, 80, 0.98) 50%,
+        rgba(52, 73, 94, 0.95) 100%
+    );
+    padding: 50px 70px;
+    border-radius: 25px;
+    border: 6px solid #2c3e50;
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.8),
+        inset 0 4px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(44, 62, 80, 0.6);
+    max-width: 600px;
     width: 90%;
+    position: relative;
+    overflow: hidden;
+    animation: messageArise 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+}
+
+@keyframes messageArise {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.game-over-message::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(212, 175, 55, 0.05) 10px,
+            rgba(212, 175, 55, 0.05) 20px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgba(52, 73, 94, 0.1) 10px,
+            rgba(52, 73, 94, 0.1) 20px
+        );
+    border-radius: 19px;
+    pointer-events: none;
 }
 
 .game-over-message h1 {
-    font-size: 48px;
-    margin: 0 0 20px 0;
-    color: #ffffff;
+    font-size: 3.2rem;
+    font-weight: 900;
+    margin: 0 0 25px 0;
+    color: #e74c3c;
+    text-shadow:
+        3px 3px 0 #c0392b,
+        6px 6px 0 #a93226,
+        9px 9px 15px rgba(0, 0, 0, 0.8);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: defeatGlow 3s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes defeatGlow {
+    0%,
+    100% {
+        background-position: 0% 50%;
+        filter: drop-shadow(0 0 20px rgba(231, 76, 60, 0.3));
+    }
+    50% {
+        background-position: 100% 50%;
+        filter: drop-shadow(0 0 30px rgba(231, 76, 60, 0.5));
+    }
 }
 
 .game-over-reason {
-    font-size: 20px;
-    margin: 0 0 20px 0;
-    color: #ffcccc;
+    font-size: 1.4rem;
+    margin: 0 0 25px 0;
+    color: #bdc3c7;
+    font-style: italic;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    position: relative;
+    z-index: 2;
 }
 
 .game-over-stats {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
+    margin: 25px 0;
+    padding: 20px;
+    background: rgba(44, 62, 80, 0.6);
+    border: 3px solid #34495e;
+    border-radius: 15px;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.4);
+    position: relative;
+    z-index: 2;
+}
+
+.game-over-stats::before {
+    content: "⚓";
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #d4af37, #f1c40f);
+    border: 2px solid #b8860b;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #2c3e50;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
 .game-over-stats p {
-    font-size: 18px;
+    font-size: 1.2rem;
     margin: 0;
-    color: #ffffff;
+    color: #ecf0f1;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .final-score {
-    font-size: 24px;
+    font-size: 1.8rem;
     font-weight: bold;
-    color: #4caf50;
+    color: #f39c12;
+    text-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(243, 156, 18, 0.4);
+    display: inline-block;
+    animation: scoreGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes scoreGlow {
+    from {
+        color: #f39c12;
+        text-shadow:
+            2px 2px 4px rgba(0, 0, 0, 0.8),
+            0 0 15px rgba(243, 156, 18, 0.4);
+    }
+    to {
+        color: #f1c40f;
+        text-shadow:
+            2px 2px 4px rgba(0, 0, 0, 0.8),
+            0 0 25px rgba(241, 196, 15, 0.6);
+    }
 }
 
 .game-over-buttons {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     justify-content: center;
-    margin-top: 30px;
+    margin-top: 35px;
+    position: relative;
+    z-index: 2;
 }
 
 .restart-button,
 .menu-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-family: "Pirata One", serif;
-    font-size: 16px;
+    padding: 15px 30px;
+    border: 4px solid;
+    border-radius: 12px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 1.1rem;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 120px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    min-width: 140px;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    box-shadow:
+        0 6px 15px rgba(0, 0, 0, 0.6),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.restart-button::before,
+.menu-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.restart-button:hover::before,
+.menu-button:hover::before {
+    left: 100%;
 }
 
 .restart-button {
-    background-color: #4caf50;
-    color: white;
+    background: linear-gradient(145deg, #27ae60, #2ecc71);
+    border-color: #229954;
+    color: #ffffff;
 }
 
 .restart-button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
+    background: linear-gradient(145deg, #2ecc71, #58d68d);
+    border-color: #28b463;
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.7),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.restart-button:active {
+    transform: translateY(-1px);
 }
 
 .menu-button {
-    background-color: #4a9b8e;
-    color: white;
+    background: linear-gradient(145deg, #34495e, #2c3e50);
+    border-color: #2c3e50;
+    color: #ecf0f1;
 }
 
 .menu-button:hover {
-    background-color: #5fada0;
-    transform: translateY(-2px);
+    background: linear-gradient(145deg, #5d6d7e, #34495e);
+    border-color: #34495e;
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.7),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
 }
 
-@keyframes fade-in {
-    from {
-        opacity: 0;
+.menu-button:active {
+    transform: translateY(-1px);
+}
+
+/* Waves animation for background effect */
+.game-over-overlay::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(
+        0deg,
+        rgba(21, 67, 96, 0.6) 0%,
+        transparent 100%
+    );
+    animation: waves 3s ease-in-out infinite;
+}
+
+@keyframes waves {
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.6;
     }
-    to {
-        opacity: 1;
+    50% {
+        transform: translateY(-10px);
+        opacity: 0.8;
     }
 }
 
@@ -499,37 +777,51 @@
     }
 
     .game-over-message {
-        padding: 20px 30px;
+        padding: 30px 40px;
         margin: 0 20px;
     }
 
     .game-over-message h1 {
-        font-size: 32px;
-        margin-bottom: 15px;
+        font-size: 2.4rem;
+        margin-bottom: 20px;
     }
 
     .game-over-reason {
-        font-size: 16px;
+        font-size: 1.2rem;
     }
 
     .game-over-stats p {
-        font-size: 16px;
+        font-size: 1rem;
     }
 
     .final-score {
-        font-size: 20px;
+        font-size: 1.4rem;
     }
 
     .game-over-buttons {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+    }
+
+    .replay-tutorial-button {
+        top: 30px;
+        right: 30px;
+        padding: 10px 12px;
+        font-size: 12px;
+        min-width: 100px;
+        max-width: 160px;
+    }
+
+    .replay-tutorial-button svg {
+        width: 14px;
+        height: 14px;
     }
 
     .restart-button,
     .menu-button {
-        padding: 10px 20px;
-        font-size: 14px;
-        min-width: 100px;
+        padding: 12px 25px;
+        font-size: 1rem;
+        min-width: 120px;
     }
 
     .cannon {
@@ -550,5 +842,59 @@
     .error-text {
         font-size: 20px;
         padding: 15px 20px;
+    }
+}
+
+/* Pause overlay */
+.pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    backdrop-filter: blur(5px);
+}
+
+.pause-indicator {
+    background: linear-gradient(145deg, #2a4a5c, #1e3a4a);
+    border: 3px solid #4a9b8e;
+    border-radius: 20px;
+    padding: 40px 60px;
+    text-align: center;
+    color: white;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.pause-indicator h2 {
+    font-size: 36px;
+    margin: 0 0 15px 0;
+    color: #4a9b8e;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.pause-indicator p {
+    font-size: 18px;
+    margin: 0;
+    color: #cccccc;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+    .pause-indicator {
+        padding: 30px 40px;
+    }
+
+    .pause-indicator h2 {
+        font-size: 28px;
+    }
+
+    .pause-indicator p {
+        font-size: 16px;
     }
 }

@@ -212,79 +212,152 @@
 
 .bottom-buttons {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    width: 300px;
+    justify-content: space-evenly;
 }
 
-.icon-button {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(145deg, #8b4513, #a0522d, #d2691e);
-    border: 4px solid #654321;
-    border-radius: 12px;
-    color: #ffffff;
-    font-size: 1.8rem;
+/* Nautical Icon Buttons */
+.nautical-icon-button {
+    width: 70px;
+    height: 70px;
+    background: none;
+    border: none;
     cursor: pointer;
+    position: relative;
     transition: all 0.3s ease;
+    padding: 0;
+}
+
+.button-anchor {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+    border: 3px solid #d4af37;
+    border-radius: 16px;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.button-anchor::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        rgba(212, 175, 55, 0.1) 0%,
+        transparent 50%,
+        rgba(212, 175, 55, 0.1) 100%
+    );
+}
+
+.button-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.6),
-        inset 0 2px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
 
-/* Wood texture for icon buttons */
-.icon-button::before {
-    content: "";
+.nautical-icon {
+    width: 28px;
+    height: 28px;
+    color: #d4af37;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    transition: all 0.3s ease;
+}
+
+.rope-decoration {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.1) 2px,
-            rgba(0, 0, 0, 0.1) 4px
-        ),
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 1px,
-            rgba(0, 0, 0, 0.05) 1px,
-            rgba(0, 0, 0, 0.05) 2px
-        );
-    border-radius: 8px;
+    width: 2px;
+    height: 12px;
+    background: linear-gradient(180deg, #8b4513 0%, #654321 50%, #8b4513 100%);
+    border-radius: 2px;
+    opacity: 0.7;
 }
 
-.icon-button:hover {
-    transform: translateY(-3px);
+.rope-decoration.left {
+    top: 8px;
+    left: 8px;
+}
+
+.rope-decoration.right {
+    top: 8px;
+    right: 8px;
+}
+
+.compass-ring {
+    display: none;
+}
+
+.spinning {
+    animation: compass-spin 2s linear infinite;
+}
+
+@keyframes compass-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Hover Effects */
+.nautical-icon-button:hover .button-anchor {
+    transform: translateY(-2px);
     box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.7),
-        inset 0 2px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-    border-color: #8b4513;
+        0 6px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    border-color: #f1c40f;
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 50%, #34495e 100%);
 }
 
-.icon-button:active {
-    transform: translateY(-1px);
+.nautical-icon-button:hover .nautical-icon {
+    color: #f1c40f;
+    transform: scale(1.1);
+}
+
+/* Active State */
+.nautical-icon-button:active .button-anchor {
+    transform: translateY(0px);
     box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.6),
-        + inset 0 2px 0 rgba(255, 255, 255, 0.1),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.4);
+        0 2px 8px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4);
 }
 
-.icon {
-    position: relative;
-    z-index: 1;
-    font-size: 1.4rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+/* Special Styling for Mute Button */
+.mute-button .button-anchor {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
+    border-color: #60a5fa;
+}
+
+.mute-button:hover .button-anchor {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 50%, #3b82f6 100%);
+    border-color: #93c5fd;
+}
+
+.mute-button .nautical-icon {
+    color: #60a5fa;
+}
+
+.mute-button:hover .nautical-icon {
+    color: #93c5fd;
 }
 
 /* Responsive design */
@@ -309,10 +382,19 @@
         margin-top: 15px;
     }
 
-    .icon-button {
-        width: 70px;
-        height: 70px;
-        font-size: 1.6rem;
+    .nautical-icon-button {
+        width: 60px;
+        height: 60px;
+    }
+
+    .nautical-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .rope-decoration {
+        width: 1px;
+        height: 10px;
     }
 }
 
@@ -332,10 +414,23 @@
         height: 80px;
     }
 
-    .icon-button {
-        width: 60px;
-        height: 60px;
-        font-size: 1.4rem;
+    .nautical-icon-button {
+        width: 55px;
+        height: 55px;
+    }
+
+    .nautical-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .rope-decoration {
+        width: 1px;
+        height: 8px;
+    }
+
+    .bottom-buttons {
+        gap: 20px;
     }
 
     .content-container {

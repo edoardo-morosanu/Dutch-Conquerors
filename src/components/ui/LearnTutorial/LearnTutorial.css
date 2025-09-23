@@ -1,4 +1,4 @@
-.first-popup-overlay {
+.learn-tutorial-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,7 +8,7 @@
     pointer-events: auto;
 }
 
-.first-popup-backdrop {
+.learn-tutorial-backdrop {
     position: absolute;
     top: 0;
     left: 0;
@@ -21,12 +21,12 @@
     cursor: not-allowed;
 }
 
-.first-popup-clickable-area {
+.learn-tutorial-clickable-area {
     border-radius: 15px;
     cursor: pointer;
 }
 
-.first-popup-content {
+.learn-tutorial-content {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -50,7 +50,7 @@
     flex-direction: column;
 }
 
-.first-popup-header {
+.learn-tutorial-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -60,14 +60,14 @@
     flex-shrink: 0;
 }
 
-.first-popup-title {
+.learn-tutorial-title {
     font-size: 24px;
     margin: 0;
     color: #4a9b8e;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.first-popup-progress {
+.learn-tutorial-progress {
     font-size: 14px;
     color: #cccccc;
     background: rgba(74, 155, 142, 0.2);
@@ -76,20 +76,20 @@
     border: 1px solid rgba(74, 155, 142, 0.4);
 }
 
-.first-popup-body {
+.learn-tutorial-body {
     margin-bottom: 15px;
     flex: 1;
     overflow-y: auto;
 }
 
-.first-popup-description {
+.learn-tutorial-description {
     font-size: 18px;
     line-height: 1.5;
     margin: 0 0 15px 0;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.first-popup-button-text {
+.learn-tutorial-button-text {
     font-size: 16px;
     color: #a0d4cc;
     margin: 0;
@@ -97,7 +97,7 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.first-popup-actions {
+.learn-tutorial-actions {
     margin-bottom: 15px;
     margin-top: auto;
 }
@@ -110,7 +110,7 @@
     margin-top: 10px;
 }
 
-.first-popup-btn {
+.learn-tutorial-btn {
     padding: 10px 16px;
     border: none;
     border-radius: 8px;
@@ -169,7 +169,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.first-popup-indicators {
+.learn-tutorial-indicators {
     display: flex;
     justify-content: center;
     gap: 8px;
@@ -199,102 +199,6 @@
 .indicator:hover {
     transform: scale(1.1);
     border-width: 3px;
-}
-
-/* Tutorial content styles */
-.tutorial-step-content {
-    margin: 15px 0;
-    padding: 15px;
-    background: rgba(74, 155, 142, 0.1);
-    border-radius: 12px;
-    border: 1px solid rgba(74, 155, 142, 0.3);
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.tutorial-rules-content .maritime-section {
-    margin-bottom: 20px;
-}
-
-.tutorial-rules-content .section-anchor {
-    font-size: 24px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.tutorial-rules-content .section-title {
-    font-size: 18px;
-    color: #4a9b8e;
-    margin: 0 0 15px 0;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.tutorial-rules-content .maritime-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.tutorial-rules-content .maritime-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(74, 155, 142, 0.2);
-    font-size: 16px;
-    line-height: 1.4;
-}
-
-.tutorial-rules-content .maritime-list li:last-child {
-    border-bottom: none;
-}
-
-.tutorial-controls-content .controls-map {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.tutorial-controls-content .control-entry {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(74, 155, 142, 0.2);
-}
-
-.tutorial-controls-content .nautical-key {
-    background: linear-gradient(145deg, #2a4a5c, #1e3a4a);
-    color: #4a9b8e;
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 2px solid #4a9b8e;
-    font-family: "Segoe UI", "Arial", sans-serif;
-    font-weight: bold;
-    min-width: 80px;
-    text-align: center;
-    font-size: 14px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.tutorial-controls-content .control-description {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.tutorial-controls-content .control-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #4a9b8e;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-.tutorial-controls-content .control-detail {
-    font-size: 14px;
-    color: #cccccc;
-    line-height: 1.3;
 }
 
 /* Arrow pointer */
@@ -345,26 +249,26 @@
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .first-popup-content {
+    .learn-tutorial-content {
         width: 90vw;
         height: 80vh;
         padding: 25px 20px;
         margin: 20px;
     }
 
-    .first-popup-title {
+    .learn-tutorial-title {
         font-size: 20px;
     }
 
-    .first-popup-description {
+    .learn-tutorial-description {
         font-size: 16px;
     }
 
-    .first-popup-button-text {
+    .learn-tutorial-button-text {
         font-size: 14px;
     }
 
-    .first-popup-btn {
+    .learn-tutorial-btn {
         padding: 10px 16px;
         font-size: 14px;
         min-width: 80px;
@@ -375,59 +279,27 @@
         gap: 10px;
         align-items: stretch;
     }
-
-    .tutorial-controls-content .control-entry {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .tutorial-controls-content .nautical-key {
-        min-width: 60px;
-        font-size: 12px;
-    }
-
-    .tutorial-step-content {
-        padding: 15px;
-        margin: 15px 0;
-    }
 }
 
 @media (max-width: 480px) {
-    .first-popup-content {
+    .learn-tutorial-content {
         width: 95vw;
         height: 85vh;
         padding: 20px 15px;
     }
 
-    .first-popup-title {
+    .learn-tutorial-title {
         font-size: 18px;
     }
 
-    .first-popup-description {
+    .learn-tutorial-description {
         font-size: 14px;
     }
 
-    .first-popup-btn {
+    .learn-tutorial-btn {
         padding: 8px 12px;
         font-size: 12px;
         min-width: 70px;
-    }
-
-    .tutorial-rules-content .section-title {
-        font-size: 16px;
-    }
-
-    .tutorial-rules-content .maritime-list li {
-        font-size: 14px;
-    }
-
-    .tutorial-controls-content .control-name {
-        font-size: 14px;
-    }
-
-    .tutorial-controls-content .control-detail {
-        font-size: 12px;
     }
 
     .tutorial-arrow {
@@ -437,7 +309,7 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    .first-popup-content {
+    .learn-tutorial-content {
         border: 4px solid white;
         background: #000000;
     }
@@ -455,13 +327,12 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-    .first-popup-backdrop,
-    .first-popup-content,
-    .first-popup-spotlight {
+    .learn-tutorial-backdrop,
+    .learn-tutorial-content {
         animation: none;
     }
 
-    .first-popup-btn,
+    .learn-tutorial-btn,
     .indicator {
         transition: none;
     }

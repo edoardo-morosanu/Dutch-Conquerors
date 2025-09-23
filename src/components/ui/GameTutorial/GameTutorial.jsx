@@ -1,54 +1,43 @@
 import React, { useState, useEffect } from "react";
-import "./FirstPopup.css";
+import "./GameTutorial.css";
 
-const FirstPopup = ({ isOpen, onComplete }) => {
+const GameTutorial = ({ isOpen, onComplete }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
 
     const steps = [
         {
-            id: "music",
-            title: "Background Music",
-            description: "Background music is muted by default.",
-            buttonText: "You can turn it on anytime using this button",
-            highlightSelector: ".mute-button",
-            position: "center",
-        },
-        {
-            id: "game-rules",
-            title: "Game Rules",
-            description: "Learn the basics of Dutch Conquerors naval combat!",
-            buttonText: null,
+            id: "welcome",
+            title: "Welcome to Dutch Conquerors!",
+            description:
+                "Get ready for naval combat while learning Dutch vocabulary!",
+            buttonText:
+                "Your mission: sink the ship with the correct English translation",
             highlightSelector: null,
             position: "center",
-            content: (
-                <div className="tutorial-rules-content">
-                    <div className="maritime-section">
-                        <div className="section-anchor">⚓</div>
-                        <h4 className="section-title">Mission Objectives</h4>
-                        <ul className="maritime-list">
-                            <li>
-                                Target the ship with the correct English
-                                translation of the Dutch word displayed
-                            </li>
-                            <li>
-                                Achieve high scores by conquering enemy fleets
-                            </li>
-                            <li>
-                                Monitor your ship's health - three strikes and
-                                you're out!
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            ),
         },
         {
-            id: "game-controls",
-            title: "Ship Controls",
+            id: "ships",
+            title: "Enemy Fleet",
             description:
-                "Master these controls to command your vessel effectively.",
-            buttonText: null,
+                "Each ship carries an English word. Find the one that matches the Dutch word shown below.",
+            buttonText: "Look for ships on the horizon - they're your targets!",
+            highlightSelector: ".ships-container",
+            position: "center",
+        },
+        {
+            id: "dutch-word",
+            title: "Dutch Word Challenge",
+            description: "The Dutch word appears at the bottom of your screen.",
+            buttonText: "This is the word you need to translate to English",
+            highlightSelector: ".current-word-display",
+            position: "center",
+        },
+        {
+            id: "cannon-aim",
+            title: "Cannon Controls",
+            description: "Use A/D keys or arrow keys to aim your cannon.",
+            buttonText: "Position your cannon to target the correct ship",
             highlightSelector: null,
             position: "center",
             content: (
@@ -57,11 +46,9 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                         <div className="control-entry">
                             <div className="nautical-key">A D / ← →</div>
                             <div className="control-description">
-                                <span className="control-name">
-                                    Cannon Positioning
-                                </span>
+                                <span className="control-name">Aim Cannon</span>
                                 <span className="control-detail">
-                                    Navigate your cannon left and right
+                                    Move cannon left and right
                                 </span>
                             </div>
                         </div>
@@ -72,18 +59,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                                     Fire Cannon
                                 </span>
                                 <span className="control-detail">
-                                    Launch cannonball at target vessel
-                                </span>
-                            </div>
-                        </div>
-                        <div className="control-entry">
-                            <div className="nautical-key">ESC</div>
-                            <div className="control-description">
-                                <span className="control-name">
-                                    Pause Orders
-                                </span>
-                                <span className="control-detail">
-                                    Halt battle and access menu
+                                    Launch cannonball at target
                                 </span>
                             </div>
                         </div>
@@ -92,12 +68,29 @@ const FirstPopup = ({ isOpen, onComplete }) => {
             ),
         },
         {
+            id: "health",
+            title: "Ship Health",
+            description: "Monitor your lives in the bottom left corner.",
+            buttonText: "You have 3 lives - hitting wrong ships costs you one!",
+            highlightSelector: ".score-display",
+            position: "center",
+        },
+        {
+            id: "scoring",
+            title: "Scoring System",
+            description:
+                "Earn points by hitting the correct ships and avoid wrong targets!",
+            buttonText: "The faster you are, the higher your score",
+            highlightSelector: ".score-display",
+            position: "center",
+        },
+        {
             id: "replay-info",
             title: "Tutorial Replay",
             description: "You can replay this tutorial anytime!",
             buttonText:
-                "Click the rules button (highlighted with an arrow) to replay this tutorial",
-            highlightSelector: ".rules-button",
+                "Click the tutorial button (highlighted with an arrow) in the top right to replay this tutorial",
+            highlightSelector: ".replay-tutorial-button",
             position: "center",
             showArrow: true,
         },
@@ -170,12 +163,12 @@ const FirstPopup = ({ isOpen, onComplete }) => {
 
     return (
         <div
-            className="first-popup-overlay"
+            className="game-tutorial-overlay"
             onClick={(e) => e.stopPropagation()}
         >
-            {/* Single overlay with cutout for highlighted button */}
+            {/* Single overlay with cutout for highlighted element */}
             <div
-                className="first-popup-backdrop"
+                className="game-tutorial-backdrop"
                 onClick={(e) => e.stopPropagation()}
                 style={
                     highlightPos
@@ -186,24 +179,25 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                 }
             />
 
-            {/* Arrow pointing to highlighted element */}
+            {/* Arrow pointing from tutorial to highlighted element */}
             {highlightPos && currentStepData.showArrow && (
                 <div
                     className="tutorial-arrow"
                     style={{
                         position: "absolute",
-                        top: highlightPos.top - 80,
+                        top: highlightPos.top + highlightPos.height + 30,
                         left: highlightPos.left + highlightPos.width / 2 - 36,
                         zIndex: 10004,
                     }}
                 >
-                    ↓
+                    ↑
                 </div>
             )}
+
             {/* Make highlighted element clickable */}
             {highlightPos && (
                 <div
-                    className="first-popup-clickable-area"
+                    className="game-tutorial-clickable-area"
                     style={{
                         position: "absolute",
                         top: highlightPos.top,
@@ -219,7 +213,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                         const element = getHighlightedElement();
                         if (element) {
                             element.click();
-                            // If user clicks rules button in final step, complete tutorial
+                            // If user clicks replay button in final step, complete tutorial
                             if (
                                 currentStep === steps.length - 1 &&
                                 steps[currentStep].id === "replay-info"
@@ -230,21 +224,22 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                     }}
                 />
             )}
+
             {/* Tutorial content */}
-            <div className="first-popup-content">
-                <div className="first-popup-header">
-                    <h2 className="first-popup-title">
+            <div className="game-tutorial-content">
+                <div className="game-tutorial-header">
+                    <h2 className="game-tutorial-title">
                         {currentStepData.title}
                     </h2>
-                    <div className="first-popup-progress">
+                    <div className="game-tutorial-progress">
                         <span>
                             {currentStep + 1} of {steps.length}
                         </span>
                     </div>
                 </div>
 
-                <div className="first-popup-body">
-                    <p className="first-popup-description">
+                <div className="game-tutorial-body">
+                    <p className="game-tutorial-description">
                         {currentStepData.description}
                     </p>
 
@@ -255,16 +250,16 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                     )}
 
                     {currentStepData.buttonText && (
-                        <p className="first-popup-button-text">
+                        <p className="game-tutorial-button-text">
                             {currentStepData.buttonText}
                         </p>
                     )}
                 </div>
 
-                <div className="first-popup-actions">
+                <div className="game-tutorial-actions">
                     <div className="navigation-buttons">
                         <button
-                            className={`first-popup-btn back-btn ${isFirstStep ? "disabled" : ""}`}
+                            className={`game-tutorial-btn back-btn ${isFirstStep ? "disabled" : ""}`}
                             onClick={handlePrevious}
                             disabled={isFirstStep}
                         >
@@ -272,14 +267,14 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                         </button>
 
                         <button
-                            className="first-popup-btn skip-btn"
+                            className="game-tutorial-btn skip-btn"
                             onClick={handleSkip}
                         >
                             Skip Tutorial
                         </button>
 
                         <button
-                            className="first-popup-btn next-btn"
+                            className="game-tutorial-btn next-btn"
                             onClick={handleNext}
                         >
                             {isLastStep ? "Got it!" : "Next →"}
@@ -288,7 +283,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                 </div>
 
                 {/* Step indicators */}
-                <div className="first-popup-indicators">
+                <div className="game-tutorial-indicators">
                     {steps.map((_, index) => (
                         <div
                             key={index}
@@ -304,4 +299,4 @@ const FirstPopup = ({ isOpen, onComplete }) => {
     );
 };
 
-export default FirstPopup;
+export default GameTutorial;

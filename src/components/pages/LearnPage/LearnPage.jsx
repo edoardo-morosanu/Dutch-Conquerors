@@ -3,7 +3,58 @@ import "./LearnPage.css";
 import wordsData from "../../../data/words.json";
 import translationService from "../../../services/translationService.js";
 
-const LearnPage = ({ onBackClick }) => {
+// Wordlist management functions - exported for reuse
+export const getWordlistFromStorage = () => {
+    try {
+        const stored = localStorage.getItem("dutchWordlist");
+        return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error("Error reading wordlist from localStorage:", error);
+        return [];
+    }
+};
+
+export const saveWordToWordlist = (englishWord, dutchWord) => {
+    try {
+        const wordlist = getWordlistFromStorage();
+        const newWord = {
+            english: englishWord,
+            dutch: dutchWord,
+            dateAdded: new Date().toISOString(),
+        };
+
+        // Check if word already exists (avoid duplicates)
+        const exists = wordlist.some(
+            (word) =>
+                word.english.toLowerCase() === englishWord.toLowerCase() &&
+                word.dutch.toLowerCase() === dutchWord.toLowerCase(),
+        );
+
+        if (!exists) {
+            wordlist.push(newWord);
+            localStorage.setItem("dutchWordlist", JSON.stringify(wordlist));
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error("Error saving word to localStorage:", error);
+        return false;
+    }
+};
+
+export const clearWordlist = () => {
+    try {
+        localStorage.removeItem("dutchWordlist");
+        console.log("Wordlist cleared");
+        return true;
+    } catch (error) {
+        console.error("Error clearing wordlist:", error);
+        return false;
+    }
+};
+
+const LearnPage = ({ onBackClick, onReplayTutorial }) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [swipeDirection, setSwipeDirection] = useState("");
     const [englishWord, setEnglishWord] = useState("");
@@ -260,9 +311,10 @@ const LearnPage = ({ onBackClick }) => {
         `;
                 cardRef.current.style.opacity = "0";
 
-                console.log(
-                    `Swiped ${direction} - ${direction === "right" ? "Added to" : "Not added to"} wordlist`,
-                );
+                // Handle wordlist saving for right swipes
+                if (direction === "right") {
+                    saveWordToWordlist(englishWord, dutchWord);
+                }
 
                 // Reset after animation completes
                 setTimeout(() => {
@@ -308,80 +360,177 @@ const LearnPage = ({ onBackClick }) => {
                 </svg>
             </div>
 
+            {/* Replay tutorial button */}
+            {onReplayTutorial && (
+                <button
+                    className="replay-tutorial-button"
+                    onClick={onReplayTutorial}
+                    title="Replay Tutorial"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                            fill="currentColor"
+                        />
+                    </svg>
+                    Tutorial
+                </button>
+            )}
+
             {/* Instructions */}
             <div className="instructions">
                 <p className="instruction-line">
-                    Click on the card to turn it around and see the translation
+                    Click card to flip and see translation
                 </p>
             </div>
 
-            {/* Flashcard container */}
-            <div className="flashcard-container">
-                {isLoading ? (
-                    <div className="loading-card">
-                        <div className="loading-text">Loading new word...</div>
-                    </div>
-                ) : error ? (
-                    <div className="error-card">
-                        <div className="error-text">{error}</div>
-                        <button onClick={loadNewWord} className="retry-button">
-                            Try Again
-                        </button>
-                    </div>
-                ) : (
-                    <div
-                        ref={cardRef}
-                        className={`flashcard ${isFlipped ? "flipped" : ""} ${swipeDirection ? `swipe-${swipeDirection}` : ""}`}
-                        onClick={handleCardClick}
-                        onMouseDown={handleStart}
-                        onMouseMove={handleMove}
-                        onMouseUp={handleEnd}
-                        onMouseLeave={handleEnd}
-                        onTouchStart={handleStart}
-                        onTouchMove={handleMove}
-                        onTouchEnd={handleEnd}
-                    >
-                        {/* Card front */}
-                        <div className="card-face card-front">
-                            <img
-                                src="/assets/images/card.png"
-                                alt="Card"
-                                className="card-background"
-                            />
-                            <div className="card-content">
-                                <div className="language-indicator">
-                                    <span className="flag">🇳🇱</span>
-                                    <span className="language-name">Dutch</span>
-                                </div>
-                                <div className="word">{dutchWord}</div>
+            {/* Main content container */}
+            <div className="main-content">
+                {/* Flashcard container */}
+                <div className="flashcard-container">
+                    {isLoading ? (
+                        <div className="loading-card">
+                            <div className="loading-text">
+                                Loading new word...
                             </div>
                         </div>
+                    ) : error ? (
+                        <div className="error-card">
+                            <div className="error-text">{error}</div>
+                            <button
+                                onClick={loadNewWord}
+                                className="retry-button"
+                            >
+                                Try Again
+                            </button>
+                        </div>
+                    ) : (
+                        <div
+                            ref={cardRef}
+                            className={`flashcard ${isFlipped ? "flipped" : ""} ${swipeDirection ? `swipe-${swipeDirection}` : ""}`}
+                            onClick={handleCardClick}
+                            onMouseDown={handleStart}
+                            onMouseMove={handleMove}
+                            onMouseUp={handleEnd}
+                            onMouseLeave={handleEnd}
+                            onTouchStart={handleStart}
+                            onTouchMove={handleMove}
+                            onTouchEnd={handleEnd}
+                        >
+                            {/* Card front */}
+                            <div className="card-face card-front">
+                                <img
+                                    src="/assets/images/card.png"
+                                    alt="Card"
+                                    className="card-background"
+                                />
+                                <div className="card-content">
+                                    <div className="language-indicator">
+                                        <span className="flag">🇳🇱</span>
+                                        <span className="language-name">
+                                            Dutch
+                                        </span>
+                                    </div>
+                                    <div className="word">{dutchWord}</div>
+                                </div>
+                            </div>
 
-                        {/* Card back */}
-                        <div className="card-face card-back">
-                            <img
-                                src="/assets/images/card.png"
-                                alt="Card"
-                                className="card-background"
-                            />
-                            <div className="card-content">
-                                <div className="language-indicator">
-                                    <span className="flag">🇺🇸</span>
-                                    <span className="language-name">
-                                        English
-                                    </span>
+                            {/* Card back */}
+                            <div className="card-face card-back">
+                                <img
+                                    src="/assets/images/card.png"
+                                    alt="Card"
+                                    className="card-background"
+                                />
+                                <div className="card-content">
+                                    <div className="language-indicator">
+                                        <span className="flag">🇺🇸</span>
+                                        <span className="language-name">
+                                            English
+                                        </span>
+                                    </div>
+                                    <div className="word">{englishWord}</div>
                                 </div>
-                                <div className="word">{englishWord}</div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
+
+                {/* Swipe action buttons */}
+                <div className="swipe-buttons">
+                    <button
+                        className="swipe-button swipe-left-btn"
+                        onClick={() => {
+                            if (!isLoading && !error) {
+                                setSwipeDirection("left");
+                                setTimeout(() => {
+                                    setSwipeDirection("");
+                                    loadNewWord();
+                                }, 300);
+                            }
+                        }}
+                        disabled={isLoading || error}
+                        title="Skip word (don't add to wordlist)"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path
+                                d="M19 13H5l7-7v14z"
+                                fill="currentColor"
+                                transform="rotate(180 12 12)"
+                            />
+                        </svg>
+                        Skip
+                    </button>
+
+                    <button
+                        className="swipe-button swipe-right-btn"
+                        onClick={() => {
+                            if (
+                                !isLoading &&
+                                !error &&
+                                englishWord &&
+                                dutchWord
+                            ) {
+                                const success = saveWordToWordlist(
+                                    englishWord,
+                                    dutchWord,
+                                );
+                                if (success) {
+                                    setSwipeDirection("right");
+                                    setTimeout(() => {
+                                        setSwipeDirection("");
+                                        loadNewWord();
+                                    }, 300);
+                                }
+                            }
+                        }}
+                        disabled={
+                            isLoading || error || !englishWord || !dutchWord
+                        }
+                        title="Add word to wordlist"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path d="M19 13H5l7-7v14z" fill="currentColor" />
+                        </svg>
+                        Add to Wordlist
+                    </button>
+                </div>
             </div>
 
             {/* Bottom instructions */}
             <div className="swipe-instructions">
-                <p className="swipe-line">Swipe right to add to wordlist</p>
-                <p className="swipe-line">Swipe left to not add to wordlist</p>
+                <p className="swipe-line">Swipe → Add • Swipe ← Skip</p>
+                <p className="swipe-line">Or use buttons above</p>
             </div>
         </div>
     );

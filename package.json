@@ -22,10 +22,8 @@
         "maritime"
     ],
     "scripts": {
-        "dev": "node log.js dev & vite --config config/config.dev.mjs",
-        "build": "node log.js build & vite build --config config/config.prod.mjs",
-        "dev-nolog": "vite --config config/config.dev.mjs",
-        "build-nolog": "vite build --config config/config.prod.mjs"
+        "dev": "vite --config config/config.dev.mjs",
+        "build": "vite build --config config/config.prod.mjs"
     },
     "dependencies": {
         "google-translate-api-x": "^10.7.2",

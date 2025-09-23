@@ -3,7 +3,18 @@ import "./GamePage.css";
 import wordsData from "../../../data/words.json";
 import translationService from "../../../services/translationService.js";
 
-const GamePage = ({ onBackClick }) => {
+// Helper function to get wordlist from localStorage
+const getWordlistFromStorage = () => {
+    try {
+        const stored = localStorage.getItem("dutchWordlist");
+        return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error("Error reading wordlist from localStorage:", error);
+        return [];
+    }
+};
+
+const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const [score, setScore] = useState(0);
     const [lives, setLives] = useState(3);
 
@@ -22,12 +33,17 @@ const GamePage = ({ onBackClick }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [nextWordQueue, setNextWordQueue] = useState([]);
+    const [gameMode, setGameMode] = useState("random"); // "random" or "wordlist"
+    const gameModeRef = useRef("random"); // Keep a ref for reliable mode checking
+    const [wordlistQueue, setWordlistQueue] = useState([]);
     const cannonballRefs = useRef({});
     const [hitShipIndex, setHitShipIndex] = useState(null);
     const [lastHitCorrect, setLastHitCorrect] = useState(null);
     const [gameOver, setGameOver] = useState(false);
     const [gameOverReason, setGameOverReason] = useState("");
     const [lifeLost, setLifeLost] = useState(false);
+    const [showTutorialButton, setShowTutorialButton] = useState(true);
+    const [tutorialButtonFading, setTutorialButtonFading] = useState(false);
 
     // Function to get multiple random English words from local JSON data
     const getRandomWords = (count = 10) => {
@@ -66,8 +82,13 @@ const GamePage = ({ onBackClick }) => {
         return results.filter((result) => result !== null);
     };
 
-    // Function to load words into the queue
+    // Function to load words into the queue (only for random mode)
     const loadWordsIntoQueue = async () => {
+        // Skip API calls if in wordlist mode
+        if (gameModeRef.current === "wordlist") {
+            return;
+        }
+
         try {
             let attempts = 0;
             let totalValidWords = 0;
@@ -98,6 +119,7 @@ const GamePage = ({ onBackClick }) => {
         setGameOverReason("");
         setScore(0);
         setLives(3);
+        setGameTime(0);
         setDestroyedShips([]);
         setRedBullShips([]);
         setShipsTop(60);
@@ -107,24 +129,65 @@ const GamePage = ({ onBackClick }) => {
         setLifeLost(false);
         setCorrectHitInProgress(false);
         setCanShoot(true);
-        setupNewWordChallenge();
+        setGameTime(0);
+
+        // Maintain current game mode for restart
+        if (gameModeRef.current === "wordlist") {
+            // Reload wordlist queue for wordlist mode
+            const wordlist = getWordlistFromStorage();
+            if (wordlist.length > 0) {
+                const shuffled = [...wordlist].sort(() => Math.random() - 0.5);
+                setWordlistQueue(shuffled);
+            }
+        }
+
+        setupNewWordChallenge(gameModeRef.current);
     };
 
-    // Function to setup a new word challenge
-    const setupNewWordChallenge = async () => {
-        setIsLoading(true);
-        setError("");
+    // Function to get next word pair based on game mode
+    const getNextWordPair = async (forcedMode = null) => {
+        const currentMode = forcedMode || gameModeRef.current;
+        if (currentMode === "wordlist") {
+            // Refresh wordlist queue if it's empty by reshuffling the original wordlist
+            if (wordlistQueue.length === 0) {
+                const wordlist = getWordlistFromStorage();
+                if (wordlist.length === 0) {
+                    // NEVER fallback to random mode - use fallback word instead
+                    return { english: "sleep", dutch: "slaap" };
+                }
+                // Reshuffle and reload the wordlist instead of falling back
+                const shuffled = [...wordlist].sort(() => Math.random() - 0.5);
+                setWordlistQueue(shuffled);
+                return shuffled[0];
+            }
 
-        try {
+            const nextWord = wordlistQueue[0];
+            setWordlistQueue((prev) => prev.slice(1));
+
+            return nextWord;
+        } else {
+            return await getRandomWordPair();
+        }
+    };
+
+    // Function to get random word pair (original logic)
+    const getRandomWordPair = async () => {
+        // Early return if in wordlist mode - should not be called
+        if (gameModeRef.current === "wordlist") {
+            return { english: "sleep", dutch: "slaap" };
+        }
+
+        // Only make API calls and load random words in random mode
+        if (gameModeRef.current === "random" || !gameModeRef.current) {
             // If queue is running low, load more words
             if (nextWordQueue.length <= 2) {
                 await loadWordsIntoQueue();
             }
 
-            let correctWordPair;
             if (nextWordQueue.length > 0) {
-                correctWordPair = nextWordQueue[0];
+                const wordPair = nextWordQueue[0];
                 setNextWordQueue((prev) => prev.slice(1));
+                return wordPair;
             } else {
                 // Fallback - try harder to find valid words
                 let attempts = 0;
@@ -135,22 +198,35 @@ const GamePage = ({ onBackClick }) => {
                     const wordsWithTranslations =
                         await findWordsWithDutchTranslations(randomWords);
                     if (wordsWithTranslations.length > 0) {
-                        correctWordPair = wordsWithTranslations[0];
-                        foundWord = true;
+                        return wordsWithTranslations[0];
                     }
                     attempts++;
                 }
 
-                if (!foundWord) {
-                    correctWordPair = { english: "sleep", dutch: "slaap" };
-                }
+                // Final fallback
+                return { english: "sleep", dutch: "slaap" };
             }
+        } else {
+            // In wordlist mode, this shouldn't be called, but provide fallback
+            return { english: "sleep", dutch: "slaap" };
+        }
+    };
+
+    // Function to setup a new word challenge
+    const setupNewWordChallenge = async (forcedMode = null) => {
+        setIsLoading(true);
+        setError("");
+
+        try {
+            // Get word pair based on current game mode or forced mode
+            const correctWordPair = await getNextWordPair(forcedMode);
 
             // Set the target Dutch word and correct English word
             setCurrentDutchWord(correctWordPair.dutch);
             setCurrentEnglishWord(correctWordPair.english);
 
             // Get random incorrect English words for other ships
+            // Always use random words from JSON data for incorrect options (adds complexity)
             const incorrectWords = getRandomWords(20)
                 .filter(
                     (word) =>
@@ -263,7 +339,9 @@ const GamePage = ({ onBackClick }) => {
                         // Load new word challenge after correct hit
                         setTimeout(async () => {
                             if (!gameOver) {
-                                await setupNewWordChallenge();
+                                await setupNewWordChallenge(
+                                    gameModeRef.current,
+                                );
                                 setLastHitCorrect(null);
                                 setCorrectHitInProgress(false);
                                 setCanShoot(true); // Re-enable shooting when new challenge loads
@@ -426,18 +504,18 @@ const GamePage = ({ onBackClick }) => {
 
     // Game timer effect
     useEffect(() => {
-        if (gameOver) return; // Don't run timer when game is over
+        if (gameOver || isGameTutorialOpen) return; // Don't run timer when game is over or tutorial is open
 
         const gameTimer = setInterval(() => {
             setGameTime((prevTime) => prevTime + 0.1);
         }, 100);
 
         return () => clearInterval(gameTimer);
-    }, [gameTime, gameOver]);
+    }, [gameOver, isGameTutorialOpen]);
 
     // Ship movement effect
     useEffect(() => {
-        if (isLoading || gameOver) return;
+        if (isLoading || gameOver || isGameTutorialOpen) return;
 
         const moveShips = () => {
             setShipsTop((prevTop) => {
@@ -468,11 +546,11 @@ const GamePage = ({ onBackClick }) => {
 
         const movementInterval = setInterval(moveShips, 16);
         return () => clearInterval(movementInterval);
-    }, [score, isLoading, gameOver]);
+    }, [score, isLoading, gameOver, isGameTutorialOpen]);
 
     // Collision detection effect
     useEffect(() => {
-        if (cannonballs.length === 0 || gameOver) return;
+        if (cannonballs.length === 0 || gameOver || isGameTutorialOpen) return;
 
         const collisionInterval = setInterval(() => {
             checkCollisions();
@@ -481,23 +559,73 @@ const GamePage = ({ onBackClick }) => {
         return () => clearInterval(collisionInterval);
     }, [
         cannonballs,
-        shipsTop,
-        correctShipIndex,
-        currentDutchWord,
         shipWords,
+        correctShipIndex,
         destroyedShips,
         gameOver,
+        hitShipIndex,
+        correctHitInProgress,
     ]);
 
-    // Initialize game
+    // Tutorial button timer effect - fade out after 3 seconds
     useEffect(() => {
-        const initializeGame = async () => {
-            await loadWordsIntoQueue();
-            await setupNewWordChallenge();
+        const fadeTimer = setTimeout(() => {
+            setTutorialButtonFading(true);
+        }, 3000);
+
+        const hideTimer = setTimeout(() => {
+            setShowTutorialButton(false);
+        }, 4000);
+
+        return () => {
+            clearTimeout(fadeTimer);
+            clearTimeout(hideTimer);
+        };
+    }, []);
+
+    // Initialize game mode and setup
+    useEffect(() => {
+        const initializeGameMode = async () => {
+            // Check for selected game mode
+            const selectedMode = localStorage.getItem("selectedGameMode");
+
+            // Only initialize if a mode was actually selected
+            if (selectedMode) {
+                // Clear the mode from storage first
+                localStorage.removeItem("selectedGameMode");
+
+                if (selectedMode === "wordlist") {
+                    const wordlist = getWordlistFromStorage();
+                    if (wordlist.length > 0) {
+                        setGameMode("wordlist");
+                        gameModeRef.current = "wordlist";
+                        const shuffled = [...wordlist].sort(
+                            () => Math.random() - 0.5,
+                        );
+                        setWordlistQueue(shuffled);
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+
+                // For random mode or fallback
+                setGameMode("random");
+                gameModeRef.current = "random";
+                await loadWordsIntoQueue();
+                setIsLoading(false);
+            }
+            // No mode selected yet - keep loading state true until mode is selected
         };
 
-        initializeGame();
+        initializeGameMode();
     }, []);
+
+    // Setup initial word challenge after mode is set
+    useEffect(() => {
+        if (!isLoading && gameModeRef.current) {
+            setupNewWordChallenge(gameModeRef.current);
+        }
+    }, [isLoading, gameMode]);
 
     // Handle game over cleanup
     useEffect(() => {
@@ -563,9 +691,37 @@ const GamePage = ({ onBackClick }) => {
         return `calc(50% + ${centerOffset}px)`;
     };
 
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    };
+
     return (
         <div className="game-page">
             <div className="game-background">
+                {/* Replay tutorial button - only show for first few seconds */}
+                {onReplayTutorial && showTutorialButton && (
+                    <button
+                        className={`replay-tutorial-button ${tutorialButtonFading ? "fade-out" : ""}`}
+                        onClick={onReplayTutorial}
+                        title="Replay Tutorial"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                                fill="currentColor"
+                            />
+                        </svg>
+                        Tutorial
+                    </button>
+                )}
+
                 {/* Score and Lives Display */}
                 <div className="score-display">
                     <div>
@@ -583,6 +739,16 @@ const GamePage = ({ onBackClick }) => {
                     </div>
                 </div>
 
+                {/* Pause indicator when tutorial is open */}
+                {isGameTutorialOpen && (
+                    <div className="pause-overlay">
+                        <div className="pause-indicator">
+                            <h2>Game Paused</h2>
+                            <p>Tutorial in progress...</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Game Over Screen */}
                 {gameOver && (
                     <div className="game-over-overlay">
@@ -593,6 +759,12 @@ const GamePage = ({ onBackClick }) => {
                                 <p>
                                     Final Score:{" "}
                                     <span className="final-score">{score}</span>
+                                </p>
+                                <p>
+                                    Time:{" "}
+                                    <span className="final-time">
+                                        {formatTime(gameTime)}
+                                    </span>
                                 </p>
                             </div>
                             <div className="game-over-buttons">
@@ -631,7 +803,9 @@ const GamePage = ({ onBackClick }) => {
                     <div className="error-display">
                         <div className="error-text">{error}</div>
                         <button
-                            onClick={setupNewWordChallenge}
+                            onClick={() =>
+                                setupNewWordChallenge(gameModeRef.current)
+                            }
                             className="retry-button"
                         >
                             Try Again
@@ -708,11 +882,6 @@ const GamePage = ({ onBackClick }) => {
                         />
                     </div>
                 ))}
-
-                {/* Back Button */}
-                <button className="back-button" onClick={onBackClick}>
-                    ← Back to Menu
-                </button>
             </div>
         </div>
     );
