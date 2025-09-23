@@ -7,14 +7,6 @@ const FirstPopup = ({ isOpen, onComplete }) => {
 
     const steps = [
         {
-            id: "music",
-            title: "Background Music",
-            description: "Background music is muted by default.",
-            buttonText: "You can turn it on anytime using this button",
-            highlightSelector: ".mute-button",
-            position: "center",
-        },
-        {
             id: "game-rules",
             title: "Game Rules",
             description: "Learn the basics of Dutch Conquerors naval combat!",
@@ -96,7 +88,7 @@ const FirstPopup = ({ isOpen, onComplete }) => {
             title: "Tutorial Replay",
             description: "You can replay this tutorial anytime!",
             buttonText:
-                "Click the rules button (highlighted with an arrow) to replay this tutorial",
+                "Click the rules button located in the main menu to replay this tutorial",
             highlightSelector: ".rules-button",
             position: "center",
             showArrow: true,

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
 .game-tutorial-overlay {
     position: fixed;
     top: 0;
@@ -38,7 +40,7 @@
     width: 600px;
     height: 500px;
     color: white;
-    font-family: "Segoe UI", "Arial", sans-serif;
+    font-family: "Cinzel Decorative", serif;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.8),
         inset 0 2px 0 rgba(255, 255, 255, 0.1);

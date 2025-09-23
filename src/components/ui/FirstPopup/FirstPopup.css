@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
 .first-popup-overlay {
     position: fixed;
     top: 0;
@@ -28,7 +30,7 @@
 
 .first-popup-content {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: linear-gradient(145deg, #2a4a5c, #1e3a4a);
@@ -36,9 +38,9 @@
     border-radius: 20px;
     padding: 25px;
     width: 600px;
-    height: 500px;
+    height: 420px;
     color: white;
-    font-family: "Segoe UI", "Arial", sans-serif;
+    font-family: "Cinzel Decorative", serif;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.8),
         inset 0 2px 0 rgba(255, 255, 255, 0.1);
@@ -204,11 +206,11 @@
 /* Tutorial content styles */
 .tutorial-step-content {
     margin: 15px 0;
-    padding: 15px;
+    padding: 12px;
     background: rgba(74, 155, 142, 0.1);
     border-radius: 12px;
     border: 1px solid rgba(74, 155, 142, 0.3);
-    max-height: 200px;
+    max-height: 160px;
     overflow-y: auto;
 }
 
@@ -237,10 +239,10 @@
 }
 
 .tutorial-rules-content .maritime-list li {
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px solid rgba(74, 155, 142, 0.2);
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 15px;
+    line-height: 1.3;
 }
 
 .tutorial-rules-content .maritime-list li:last-child {
@@ -256,8 +258,8 @@
 .tutorial-controls-content .control-entry {
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding: 12px;
+    gap: 15px;
+    padding: 10px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     border: 1px solid rgba(74, 155, 142, 0.2);
@@ -335,7 +337,7 @@
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translate(-50%, -60%);
+        transform: translate(-50%, -55%);
     }
     to {
         opacity: 1;
@@ -347,9 +349,10 @@
 @media (max-width: 768px) {
     .first-popup-content {
         width: 90vw;
-        height: 80vh;
-        padding: 25px 20px;
+        height: 70vh;
+        padding: 20px;
         margin: 20px;
+        top: 40%;
     }
 
     .first-popup-title {
@@ -388,16 +391,18 @@
     }
 
     .tutorial-step-content {
-        padding: 15px;
-        margin: 15px 0;
+        padding: 10px;
+        margin: 10px 0;
+        max-height: 140px;
     }
 }
 
 @media (max-width: 480px) {
     .first-popup-content {
         width: 95vw;
-        height: 85vh;
-        padding: 20px 15px;
+        height: 75vh;
+        padding: 15px;
+        top: 40%;
     }
 
     .first-popup-title {

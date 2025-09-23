@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
 .learn-tutorial-overlay {
     position: fixed;
     top: 0;
@@ -5,29 +7,31 @@
     width: 100vw;
     height: 100vh;
     z-index: 10000;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 .learn-tutorial-backdrop {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(5px);
     animation: fadeIn 0.3s ease-out;
     pointer-events: auto;
     cursor: not-allowed;
+    z-index: 9999;
 }
 
 .learn-tutorial-clickable-area {
     border-radius: 15px;
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .learn-tutorial-content {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -38,13 +42,13 @@
     width: 600px;
     height: 500px;
     color: white;
-    font-family: "Segoe UI", "Arial", sans-serif;
+    font-family: "Cinzel Decorative", serif;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.8),
         inset 0 2px 0 rgba(255, 255, 255, 0.1);
     animation: slideIn 0.4s ease-out;
     pointer-events: auto;
-    z-index: 10002;
+    z-index: 10003;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -64,6 +68,8 @@
     font-size: 24px;
     margin: 0;
     color: #4a9b8e;
+    font-family: "Cinzel Decorative", serif;
+    font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
@@ -114,7 +120,7 @@
     padding: 10px 16px;
     border: none;
     border-radius: 8px;
-    font-family: "Segoe UI", "Arial", sans-serif;
+    font-family: "Cinzel Decorative", serif;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -155,6 +161,8 @@
     background: linear-gradient(145deg, #4a9b8e, #5fada0);
     color: white;
     border: 2px solid #4a9b8e;
+    font-family: "Cinzel Decorative", serif;
+    font-weight: 700;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
