@@ -39,6 +39,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const cannonballRefs = useRef({});
     const [hitShipIndex, setHitShipIndex] = useState(null);
     const [lastHitCorrect, setLastHitCorrect] = useState(null);
+    const [lastHitWasRedBull, setLastHitWasRedBull] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [gameOverReason, setGameOverReason] = useState("");
     const [lifeLost, setLifeLost] = useState(false);
@@ -126,6 +127,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
         setCannonballs([]);
         setHitShipIndex(null);
         setLastHitCorrect(null);
+        setLastHitWasRedBull(false);
         setLifeLost(false);
         setCorrectHitInProgress(false);
         setCanShoot(true);
@@ -254,6 +256,13 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
             }
             setRedBullShips(newRedBullShips);
 
+            // Log Red Bull ships for testing
+            if (newRedBullShips.length > 0) {
+                console.log(
+                    `Red Bull cars spawned at positions: ${newRedBullShips.join(", ")} (5x score bonus!)`,
+                );
+            }
+
             // Reset ships position
             setShipsTop(60);
         } catch (error) {
@@ -313,10 +322,15 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                     const isCorrectHit = shipIndex === correctShipIndex;
 
                     if (isCorrectHit) {
-                        setScore((prevScore) => prevScore + 1);
+                        // Check if this is a Red Bull ship for bonus scoring
+                        const isRedBullShip = redBullShips.includes(shipIndex);
+                        const scoreToAdd = isRedBullShip ? 5 : 1;
+
+                        setScore((prevScore) => prevScore + scoreToAdd);
                         setLastHitCorrect(true);
+                        setLastHitWasRedBull(isRedBullShip);
                         console.log(
-                            `Correct hit! "${word}" is the translation of "${currentDutchWord}"`,
+                            `Correct hit! "${word}" is the translation of "${currentDutchWord}"${isRedBullShip ? " (Red Bull car - 5 points!)" : ""}`,
                         );
 
                         // Clear ALL cannonballs immediately to prevent multiple hits
@@ -343,6 +357,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                                     gameModeRef.current,
                                 );
                                 setLastHitCorrect(null);
+                                setLastHitWasRedBull(false);
                                 setCorrectHitInProgress(false);
                                 setCanShoot(true); // Re-enable shooting when new challenge loads
                             }
@@ -352,6 +367,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         return; // Exit collision checking immediately
                     } else {
                         setLastHitCorrect(false);
+                        setLastHitWasRedBull(false);
                         console.log(
                             `Wrong hit! "${word}" is not the translation of "${currentDutchWord}"`,
                         );
@@ -383,7 +399,10 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         });
 
                         setTimeout(() => {
-                            if (!gameOver) setLastHitCorrect(null);
+                            if (!gameOver) {
+                                setLastHitCorrect(null);
+                                setLastHitWasRedBull(false);
+                            }
                         }, 1000);
 
                         // Trigger hit feedback
@@ -639,6 +658,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
             setCanShoot(false);
             setCorrectHitInProgress(false);
             setLastHitCorrect(null);
+            setLastHitWasRedBull(false);
             setHitShipIndex(null);
             setLifeLost(false);
         }
@@ -788,9 +808,13 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                 {/* Hit Feedback */}
                 {lastHitCorrect !== null && (
                     <div
-                        className={`hit-feedback ${lastHitCorrect ? "correct" : "wrong"}`}
+                        className={`hit-feedback ${lastHitCorrect ? "correct" : "wrong"} ${lastHitWasRedBull ? "red-bull-bonus" : ""}`}
                     >
-                        {lastHitCorrect ? "✓ Correct!" : "✗ Wrong!"}
+                        {lastHitCorrect
+                            ? lastHitWasRedBull
+                                ? "🏎️ Red Bull Bonus! +5 Points!"
+                                : "✓ Correct!"
+                            : "✗ Wrong!"}
                     </div>
                 )}
 

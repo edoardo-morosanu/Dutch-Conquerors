@@ -235,6 +235,7 @@ function App() {
                 <LearnPage
                     onBackClick={handleBackToMain}
                     onReplayTutorial={handleReplayLearnTutorial}
+                    isTutorialOpen={showLearnTutorial}
                 />
                 <LearnTutorial
                     isOpen={showLearnTutorial}

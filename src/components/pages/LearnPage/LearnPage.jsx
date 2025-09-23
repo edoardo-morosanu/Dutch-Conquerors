@@ -54,7 +54,7 @@ export const clearWordlist = () => {
     }
 };
 
-const LearnPage = ({ onBackClick, onReplayTutorial }) => {
+const LearnPage = ({ onBackClick, onReplayTutorial, isTutorialOpen }) => {
     const [isFlipped, setIsFlipped] = useState(false);
     const [swipeDirection, setSwipeDirection] = useState("");
     const [englishWord, setEnglishWord] = useState("");
@@ -202,13 +202,15 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
     }, []);
 
     const handleCardClick = () => {
-        if (!isDragging.current) {
+        if (!isDragging.current && !isTutorialOpen) {
             setIsFlipped(!isFlipped);
         }
     };
 
     // Touch/Mouse events for swipe
     const handleStart = (e) => {
+        if (isTutorialOpen) return;
+
         const clientX = e.type.includes("touch")
             ? e.touches[0].clientX
             : e.clientX;
@@ -228,7 +230,7 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
     };
 
     const handleMove = (e) => {
-        if (startX.current === 0) return;
+        if (startX.current === 0 || isTutorialOpen) return;
 
         const clientX = e.type.includes("touch")
             ? e.touches[0].clientX
@@ -279,8 +281,8 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
         }
     };
 
-    const handleEnd = () => {
-        if (startX.current === 0) return;
+    const handleEnd = (e) => {
+        if (startX.current === 0 || isTutorialOpen) return;
 
         const diffX = currentX.current - startX.current;
         const diffY = currentY.current - startY.current;
@@ -346,9 +348,15 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
     };
 
     return (
-        <div className="learn-page">
+        <div
+            className={`learn-page ${isTutorialOpen ? "tutorial-active" : ""}`}
+        >
             {/* Back arrow */}
-            <div className="back-arrow" onClick={onBackClick}>
+            <div
+                className={`back-arrow ${isTutorialOpen ? "tutorial-disabled" : ""}`}
+                onClick={isTutorialOpen ? undefined : onBackClick}
+                style={{ pointerEvents: isTutorialOpen ? "none" : "auto" }}
+            >
                 <svg width="60" height="40" viewBox="0 0 60 40" fill="none">
                     <path
                         d="M40 8 L20 20 L40 32"
@@ -407,7 +415,7 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
                     ) : (
                         <div
                             ref={cardRef}
-                            className={`flashcard ${isFlipped ? "flipped" : ""} ${swipeDirection ? `swipe-${swipeDirection}` : ""}`}
+                            className={`flashcard ${isFlipped ? "flipped" : ""} ${swipeDirection ? `swipe-${swipeDirection}` : ""} ${isTutorialOpen ? "tutorial-disabled" : ""}`}
                             onClick={handleCardClick}
                             onMouseDown={handleStart}
                             onMouseMove={handleMove}
@@ -461,7 +469,7 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
                     <button
                         className="swipe-button swipe-left-btn"
                         onClick={() => {
-                            if (!isLoading && !error) {
+                            if (!isLoading && !error && !isTutorialOpen) {
                                 setSwipeDirection("left");
                                 setTimeout(() => {
                                     setSwipeDirection("");
@@ -469,7 +477,7 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
                                 }, 300);
                             }
                         }}
-                        disabled={isLoading || error}
+                        disabled={isLoading || error || isTutorialOpen}
                         title="Skip word (don't add to wordlist)"
                     >
                         <svg
@@ -494,7 +502,8 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
                                 !isLoading &&
                                 !error &&
                                 englishWord &&
-                                dutchWord
+                                dutchWord &&
+                                !isTutorialOpen
                             ) {
                                 const success = saveWordToWordlist(
                                     englishWord,
@@ -510,7 +519,11 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
                             }
                         }}
                         disabled={
-                            isLoading || error || !englishWord || !dutchWord
+                            isLoading ||
+                            error ||
+                            !englishWord ||
+                            !dutchWord ||
+                            isTutorialOpen
                         }
                         title="Add word to wordlist"
                     >
@@ -529,7 +542,7 @@ const LearnPage = ({ onBackClick, onReplayTutorial }) => {
 
             {/* Bottom instructions */}
             <div className="swipe-instructions">
-                <p className="swipe-line">Swipe → Add • Swipe ← Skip</p>
+                <p className="swipe-line">Swipe right to add • Swipe left to skip</p>
                 <p className="swipe-line">Or use buttons above</p>
             </div>
         </div>
