@@ -4,6 +4,11 @@ A React-based educational maritime arcade game that combines Dutch language lear
 
 <img src="public/assets/images/logo.png" alt="Game Screenshot" width="150px"/>
 
+
+
+
+
+
 ## 🎯 Overview
 
 Dutch Conquerors transforms vocabulary learning into an engaging arcade experience. Players control a cannon ship at the bottom of the screen, shooting at enemy vessels while matching Dutch words with their English translations. The game features both an action-packed gameplay mode and a relaxed flashcard learning mode.
@@ -11,12 +16,16 @@ Dutch Conquerors transforms vocabulary learning into an engaging arcade experien
 ### Key Features
 
 - **Maritime Arcade Gameplay**: Classic ship-to-ship combat with educational twist
+
 - **Dual Learning Modes**: 
+
   - Game Mode: Fast-paced vocabulary matching during combat
   - Learn Mode: Interactive flashcard system with swipe mechanics
 - **Dynamic Translation System**: Multiple API integrations with intelligent fallbacks
+
 - **Immersive Audio**: Background music
 - **Progressive Difficulty**: Enemy ship speed increases with score
+
 
 ## 🚀 Quick Start
 
@@ -31,6 +40,7 @@ Dutch Conquerors transforms vocabulary learning into an engaging arcade experien
    ```bash
    git clone https://github.com/edoardo-morosanu/Dutch-Conquerors.git
    cd dutch-conquerors
+
    ```
 
 2. **Install dependencies**
@@ -95,7 +105,9 @@ dutch-conquerors/
 │   └── main.jsx             # React entry point
 ├── config/
 │   ├── config.dev.mjs       # Development configuration
+
 │   └── config.prod.mjs      # Production configuration
+
 └── package.json
 ```
 
@@ -105,7 +117,11 @@ dutch-conquerors/
 - **React 19**: Component-based UI framework
 - **Vite**: Modern build tool and development server
 - **CSS3**: Custom styling with animations and responsive design
+
+
 - **JavaScript ES6+**: Modern JavaScript features
+
+
 
 ### Translation Services
 The game implements a robust translation system with multiple fallback layers:
@@ -117,8 +133,11 @@ The game implements a robust translation system with multiple fallback layers:
 ### API Integration
 ```javascript
 // Translation service with intelligent fallbacks
+
 const translationService = {
+
   translate: async (text, sourceLang, targetLang) => {
+
     // Try DeepL → Google Translate → Local Dictionary
   }
 }
@@ -143,17 +162,22 @@ const translationService = {
 
 ### Adding New Vocabulary
 Edit `src/data/words.json` to add new English words:
+
 ```json
 [
   "ship",
   "anchor",
   "treasure",
   // Add your words here
+
+
 ]
 ```
 
 ### Translation Configuration
 Modify `src/services/translationService.js` to:
+
+
 - Add new API endpoints
 - Extend local dictionary
 - Configure CORS proxies
@@ -167,6 +191,7 @@ Modify `src/services/translationService.js` to:
 
 ### Learning Principles
 - **Gamification**: Points, lives, and progression to maintain engagement
+
 - **Spaced Repetition**: Flashcard mode for vocabulary reinforcement
 - **Contextual Learning**: Maritime theme provides memorable word associations
 - **Multi-modal Input**: Visual, auditory, and kinesthetic learning support
@@ -200,7 +225,7 @@ Modify `src/services/translationService.js` to:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU GENERAL PUBLIC License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -218,3 +243,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 *Ahoy! Set sail on your Dutch learning adventure with the Dutch Conquerors! ⚓🇳🇱*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
