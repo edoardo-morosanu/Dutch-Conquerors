@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
 .learn-page {
     width: 100vw;
     height: 100vh;
@@ -5,10 +7,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     overflow: hidden;
+    padding: 20px 20px 20px 20px;
+    box-sizing: border-box;
 }
 
 /* Back arrow */
@@ -25,17 +29,60 @@
     transform: scale(1.1);
 }
 
+/* Replay tutorial button */
+.replay-tutorial-button {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    background: linear-gradient(145deg, #4a9b8e, #5fada0);
+    color: white;
+    border: 2px solid #4a9b8e;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.replay-tutorial-button:hover {
+    background: linear-gradient(145deg, #5fada0, #74c2b5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.replay-tutorial-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.replay-tutorial-button svg {
+    width: 16px;
+    height: 16px;
+}
+
 /* Instructions at the top */
 .instructions {
-    position: absolute;
+    position: fixed;
     top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
     z-index: 5;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .instruction-line {
     color: white;
-    font-size: 18px;
+    font-size: 28px;
     margin: 0;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -43,12 +90,17 @@
 /* Flashcard container */
 .flashcard-container {
     perspective: 1000px;
-    margin: 20px 0;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 .flashcard {
-    width: 700px;
-    height: 450px;
+    width: 950px;
+    height: 650px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s ease-in-out;
@@ -105,8 +157,8 @@
 
 .language-indicator {
     position: absolute;
-    top: 135px;
-    right: 115px;
+    top: 150px;
+    right: 120px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -125,7 +177,7 @@
     font-size: 14px;
     font-weight: bold;
     color: #2c3e50;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 .word {
@@ -133,16 +185,21 @@
     font-weight: bold;
     color: #2c3e50;
     text-align: center;
-    font-family: "Times New Roman", serif;
+    font-family: "Cinzel Decorative", serif;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Bottom instructions */
 .swipe-instructions {
-    position: absolute;
-    bottom: 80px;
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
     z-index: 5;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 /* Swipe animations and feedback */
@@ -158,7 +215,7 @@
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     z-index: 10;
     pointer-events: none;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 .flashcard.swipe-left::before {
@@ -173,7 +230,7 @@
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     z-index: 10;
     pointer-events: none;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 .swipe-line {
@@ -182,14 +239,15 @@
     margin: 8px 0;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    font-family: "Old English Text MT", "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-weight: bold;
 }
 
 /* Loading and Error states */
 .loading-card,
 .error-card {
-    width: 700px;
-    height: 450px;
+    width: 850px;
+    height: 550px;
     background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     display: flex;
@@ -206,7 +264,7 @@
     color: #2c3e50;
     text-align: center;
     margin-bottom: 20px;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 .retry-button {
@@ -217,7 +275,7 @@
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    font-family: "Times New Roman", serif;
+    font-family: "Segoe UI", "Arial", sans-serif;
     transition: background-color 0.3s ease;
 }
 
@@ -225,57 +283,207 @@
     background: #2980b9;
 }
 
+/* Main content area */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 5px auto 0 auto;
+    justify-content: flex-start;
+    position: relative;
+    gap: 30px;
+}
+
+/* Swipe action buttons */
+.swipe-buttons {
+    display: flex;
+    gap: 30px;
+    z-index: 10;
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.swipe-button {
+    background: linear-gradient(145deg, #34495e, #2c3e50);
+    color: white;
+    border: 2px solid #4a9b8e;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    width: 160px;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.swipe-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.swipe-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.swipe-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.swipe-left-btn {
+    border-color: #e74c3c;
+}
+
+.swipe-left-btn:hover:not(:disabled) {
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
+    border-color: #c0392b;
+}
+
+.swipe-right-btn {
+    border-color: #27ae60;
+}
+
+.swipe-right-btn:hover:not(:disabled) {
+    background: linear-gradient(145deg, #27ae60, #229954);
+    border-color: #229954;
+}
+
+.swipe-button svg {
+    width: 18px;
+    height: 18px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
+    .learn-page {
+        padding: 20px 15px 15px 15px;
+    }
+
     .flashcard {
-        width: 500px;
-        height: 350px;
+        width: 600px;
+        height: 500px;
     }
 
     .word {
-        font-size: 36px;
+        font-size: 28px;
     }
 
     .instruction-line {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .swipe-line {
-        font-size: 20px;
+        font-size: 12px;
+        margin: 2px 0;
     }
 
     .back-arrow {
-        top: 30px;
-        left: 30px;
+        top: 20px;
+        left: 20px;
+    }
+
+    .replay-tutorial-button {
+        top: 20px;
+        right: 20px;
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .replay-tutorial-button svg {
+        width: 12px;
+        height: 12px;
     }
 
     .instructions {
-        top: 100px;
+        top: 45px;
+    }
+
+    .swipe-buttons {
+        bottom: 15px;
+        gap: 15px;
+    }
+
+    .swipe-button {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-width: 120px;
+        width: 120px;
+    }
+
+    .swipe-button svg {
+        width: 14px;
+        height: 14px;
     }
 
     .loading-card,
     .error-card {
-        width: 500px;
-        height: 350px;
+        width: 320px;
+        height: 400px;
     }
 
     .loading-text,
     .error-text {
-        font-size: 20px;
-    }
-
-    .language-indicator {
-        top: 15px;
-        right: 15px;
-        padding: 6px 10px;
-        gap: 6px;
-    }
-
-    .flag {
         font-size: 18px;
     }
 
+    .language-indicator {
+        top: 25px;
+        right: 25px;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .flag {
+        font-size: 16px;
+    }
+
     .language-name {
-        font-size: 12px;
+        font-size: 10px;
+    }
+
+    .swipe-instructions {
+        bottom: 5px;
+    }
+
+    .main-content {
+        margin: 5px auto 0 auto;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .flashcard {
+        width: 500px;
+        height: 400px;
+    }
+
+    .word {
+        font-size: 24px;
+    }
+
+    .swipe-buttons {
+        gap: 15px;
+        bottom: -25px;
+    }
+
+    .swipe-button {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-width: 100px;
+        width: 100px;
     }
 }

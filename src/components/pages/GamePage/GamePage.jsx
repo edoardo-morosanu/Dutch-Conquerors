@@ -1,130 +1,487 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './GamePage.css';
+import React, { useState, useEffect, useRef } from "react";
+import "./GamePage.css";
+import wordsData from "../../../data/words.json";
+import translationService from "../../../services/translationService.js";
 
-const GamePage = ({ onBackClick }) => {
+// Helper function to get wordlist from localStorage
+const getWordlistFromStorage = () => {
+    try {
+        const stored = localStorage.getItem("dutchWordlist");
+        return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error("Error reading wordlist from localStorage:", error);
+        return [];
+    }
+};
+
+const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const [score, setScore] = useState(0);
-    const [currentWord, setCurrentWord] = useState('democrate');
-    const [cannonPosition, setCannonPosition] = useState(2); // Start at middle ship (index 2)
-    const [cannonballs, setCannonballs] = useState([]); // Track active cannonballs
-    const [canShoot, setCanShoot] = useState(true); // Shooting cooldown
-    const [gameTime, setGameTime] = useState(0); // Track game time in seconds
-    const [shipsTop, setShipsTop] = useState(60); // Ships vertical position
-    const cannonballRefs = useRef({}); // Track cannonball DOM elements for collision detection
-    const [hitShipIndex, setHitShipIndex] = useState(null); // Track which ship was hit for visual feedback
-    
-    // Sample Dutch words for the ships
-    const shipWords = ['hallo', 'slaap', 'democrate', 'goedenavond', 'dag'];
+    const [lives, setLives] = useState(3);
+
+    const [currentDutchWord, setCurrentDutchWord] = useState("");
+    const [currentEnglishWord, setCurrentEnglishWord] = useState("");
+    const [shipWords, setShipWords] = useState([]);
+    const [correctShipIndex, setCorrectShipIndex] = useState(0);
+    const [destroyedShips, setDestroyedShips] = useState([]);
+    const [redBullShips, setRedBullShips] = useState([]);
+    const [cannonPosition, setCannonPosition] = useState(2);
+    const [cannonballs, setCannonballs] = useState([]);
+    const [canShoot, setCanShoot] = useState(true);
+    const [correctHitInProgress, setCorrectHitInProgress] = useState(false);
+    const [gameTime, setGameTime] = useState(0);
+    const [shipsTop, setShipsTop] = useState(60);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [nextWordQueue, setNextWordQueue] = useState([]);
+    const [gameMode, setGameMode] = useState("random"); // "random" or "wordlist"
+    const gameModeRef = useRef("random"); // Keep a ref for reliable mode checking
+    const [wordlistQueue, setWordlistQueue] = useState([]);
+    const cannonballRefs = useRef({});
+    const [hitShipIndex, setHitShipIndex] = useState(null);
+    const [lastHitCorrect, setLastHitCorrect] = useState(null);
+    const [gameOver, setGameOver] = useState(false);
+    const [gameOverReason, setGameOverReason] = useState("");
+    const [lifeLost, setLifeLost] = useState(false);
+    const [showTutorialButton, setShowTutorialButton] = useState(true);
+    const [tutorialButtonFading, setTutorialButtonFading] = useState(false);
+
+    // Function to get multiple random English words from local JSON data
+    const getRandomWords = (count = 10) => {
+        const wordsCopy = [...wordsData];
+
+        // Fisher-Yates shuffle
+        for (let i = wordsCopy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wordsCopy[i], wordsCopy[j]] = [wordsCopy[j], wordsCopy[i]];
+        }
+
+        return wordsCopy.slice(0, count);
+    };
+
+    // Function to fetch Dutch translation using translation service with fallback
+    const fetchDutchTranslation = async (word) => {
+        return await translationService.translate(word, "EN", "NL");
+    };
+
+    // Function to process words and find ones with Dutch translations
+    const findWordsWithDutchTranslations = async (words) => {
+        const promises = words.map(async (word) => {
+            const dutchTranslation = await fetchDutchTranslation(word);
+            // Filter out words that don't translate or are the same in both languages
+            if (
+                !dutchTranslation ||
+                dutchTranslation.toLowerCase().trim() ===
+                    word.toLowerCase().trim()
+            ) {
+                return null;
+            }
+            return { english: word, dutch: dutchTranslation };
+        });
+
+        const results = await Promise.all(promises);
+        return results.filter((result) => result !== null);
+    };
+
+    // Function to load words into the queue (only for random mode)
+    const loadWordsIntoQueue = async () => {
+        // Skip API calls if in wordlist mode
+        if (gameModeRef.current === "wordlist") {
+            return;
+        }
+
+        try {
+            let attempts = 0;
+            let totalValidWords = 0;
+
+            // Keep trying until we get at least 5 valid words or max 3 attempts
+            while (totalValidWords < 5 && attempts < 3) {
+                const randomWords = getRandomWords(20); // Increased to account for filtering
+                const wordsWithTranslations =
+                    await findWordsWithDutchTranslations(randomWords);
+
+                if (wordsWithTranslations.length > 0) {
+                    setNextWordQueue((prev) => [
+                        ...prev,
+                        ...wordsWithTranslations,
+                    ]);
+                    totalValidWords += wordsWithTranslations.length;
+                }
+                attempts++;
+            }
+        } catch (error) {
+            console.error("Error loading words into queue:", error);
+        }
+    };
+
+    // Function to restart the game completely
+    const restartGame = () => {
+        setGameOver(false);
+        setGameOverReason("");
+        setScore(0);
+        setLives(3);
+        setGameTime(0);
+        setDestroyedShips([]);
+        setRedBullShips([]);
+        setShipsTop(60);
+        setCannonballs([]);
+        setHitShipIndex(null);
+        setLastHitCorrect(null);
+        setLifeLost(false);
+        setCorrectHitInProgress(false);
+        setCanShoot(true);
+        setGameTime(0);
+
+        // Maintain current game mode for restart
+        if (gameModeRef.current === "wordlist") {
+            // Reload wordlist queue for wordlist mode
+            const wordlist = getWordlistFromStorage();
+            if (wordlist.length > 0) {
+                const shuffled = [...wordlist].sort(() => Math.random() - 0.5);
+                setWordlistQueue(shuffled);
+            }
+        }
+
+        setupNewWordChallenge(gameModeRef.current);
+    };
+
+    // Function to get next word pair based on game mode
+    const getNextWordPair = async (forcedMode = null) => {
+        const currentMode = forcedMode || gameModeRef.current;
+        if (currentMode === "wordlist") {
+            // Refresh wordlist queue if it's empty by reshuffling the original wordlist
+            if (wordlistQueue.length === 0) {
+                const wordlist = getWordlistFromStorage();
+                if (wordlist.length === 0) {
+                    // NEVER fallback to random mode - use fallback word instead
+                    return { english: "sleep", dutch: "slaap" };
+                }
+                // Reshuffle and reload the wordlist instead of falling back
+                const shuffled = [...wordlist].sort(() => Math.random() - 0.5);
+                setWordlistQueue(shuffled);
+                return shuffled[0];
+            }
+
+            const nextWord = wordlistQueue[0];
+            setWordlistQueue((prev) => prev.slice(1));
+
+            return nextWord;
+        } else {
+            return await getRandomWordPair();
+        }
+    };
+
+    // Function to get random word pair (original logic)
+    const getRandomWordPair = async () => {
+        // Early return if in wordlist mode - should not be called
+        if (gameModeRef.current === "wordlist") {
+            return { english: "sleep", dutch: "slaap" };
+        }
+
+        // Only make API calls and load random words in random mode
+        if (gameModeRef.current === "random" || !gameModeRef.current) {
+            // If queue is running low, load more words
+            if (nextWordQueue.length <= 2) {
+                await loadWordsIntoQueue();
+            }
+
+            if (nextWordQueue.length > 0) {
+                const wordPair = nextWordQueue[0];
+                setNextWordQueue((prev) => prev.slice(1));
+                return wordPair;
+            } else {
+                // Fallback - try harder to find valid words
+                let attempts = 0;
+                let foundWord = false;
+
+                while (!foundWord && attempts < 3) {
+                    const randomWords = getRandomWords(10);
+                    const wordsWithTranslations =
+                        await findWordsWithDutchTranslations(randomWords);
+                    if (wordsWithTranslations.length > 0) {
+                        return wordsWithTranslations[0];
+                    }
+                    attempts++;
+                }
+
+                // Final fallback
+                return { english: "sleep", dutch: "slaap" };
+            }
+        } else {
+            // In wordlist mode, this shouldn't be called, but provide fallback
+            return { english: "sleep", dutch: "slaap" };
+        }
+    };
+
+    // Function to setup a new word challenge
+    const setupNewWordChallenge = async (forcedMode = null) => {
+        setIsLoading(true);
+        setError("");
+
+        try {
+            // Get word pair based on current game mode or forced mode
+            const correctWordPair = await getNextWordPair(forcedMode);
+
+            // Set the target Dutch word and correct English word
+            setCurrentDutchWord(correctWordPair.dutch);
+            setCurrentEnglishWord(correctWordPair.english);
+
+            // Get random incorrect English words for other ships
+            // Always use random words from JSON data for incorrect options (adds complexity)
+            const incorrectWords = getRandomWords(20)
+                .filter(
+                    (word) =>
+                        word.toLowerCase() !==
+                        correctWordPair.english.toLowerCase(),
+                )
+                .slice(0, 4);
+
+            // Create ship words array with one correct and 4 incorrect
+            const newShipWords = [...incorrectWords];
+            const randomCorrectIndex = Math.floor(Math.random() * 5);
+            newShipWords.splice(randomCorrectIndex, 0, correctWordPair.english);
+
+            setShipWords(newShipWords.slice(0, 5));
+            setCorrectShipIndex(randomCorrectIndex);
+            setDestroyedShips([]);
+
+            // Determine which ships should be Red Bull cars (3.3% chance each, ~15% per round)
+            const newRedBullShips = [];
+            for (let i = 0; i < 5; i++) {
+                if (Math.random() < 0.033) {
+                    // 3.3% chance per ship = ~15% chance per round
+                    newRedBullShips.push(i);
+                }
+            }
+            setRedBullShips(newRedBullShips);
+
+            // Reset ships position
+            setShipsTop(60);
+        } catch (error) {
+            console.error("Error setting up word challenge:", error);
+            setError("Failed to load words. Please try again.");
+            // Fallback
+            setCurrentDutchWord("slaap");
+            setCurrentEnglishWord("sleep");
+            setShipWords(["sleep", "house", "water", "fire", "tree"]);
+            setCorrectShipIndex(0);
+            setDestroyedShips([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // Collision detection function
     const checkCollisions = () => {
-        cannonballs.forEach(ball => {
+        let correctHitOccurred = false;
+
+        cannonballs.forEach((ball) => {
+            if (correctHitOccurred) return; // Skip if correct hit already occurred
+
             const cannonballElement = cannonballRefs.current[ball.id];
             if (!cannonballElement) return;
 
             const ballRect = cannonballElement.getBoundingClientRect();
-            
-            // Check collision with each ship
-            shipWords.forEach((word, shipIndex) => {
-                // Calculate ship position
+
+            // Check collision with each ship (only non-destroyed ones)
+            for (let shipIndex = 0; shipIndex < shipWords.length; shipIndex++) {
+                if (destroyedShips.includes(shipIndex)) continue; // Skip destroyed ships
+
+                const word = shipWords[shipIndex];
                 const shipWidth = 250;
-                const shipHeight = 150; // Approximate ship height
+                const shipHeight = 150;
                 const shipGap = 40;
                 const totalShips = shipWords.length;
-                
-                // Calculate ship's horizontal position (same logic as in render)
-                const centerOffset = (shipIndex - Math.floor(totalShips / 2)) * (shipWidth + shipGap);
-                const shipLeft = window.innerWidth / 2 + centerOffset - shipWidth / 2;
+
+                // Calculate ship position based on original index (maintains spacing)
+                const centerOffset =
+                    (shipIndex - Math.floor(totalShips / 2)) *
+                    (shipWidth + shipGap);
+                const shipLeft =
+                    window.innerWidth / 2 + centerOffset - shipWidth / 2;
                 const shipRight = shipLeft + shipWidth;
                 const shipTop = shipsTop;
                 const shipBottom = shipsTop + shipHeight;
-                
-                // Check if cannonball intersects with ship
-                const isColliding = (
+
+                const isColliding =
                     ballRect.left < shipRight &&
                     ballRect.right > shipLeft &&
                     ballRect.top < shipBottom &&
-                    ballRect.bottom > shipTop
-                );
-                
+                    ballRect.bottom > shipTop;
+
                 if (isColliding) {
-                    // Collision detected! Reset ships to starting position
-                    setShipsTop(60);
-                    
-                    // Increase score on hit
-                    setScore(prevScore => prevScore + 1);
-                    
-                    // Trigger hit feedback for specific ship
-                    setHitShipIndex(shipIndex);
-                    setTimeout(() => setHitShipIndex(null), 500); // Flash effect for 500ms
-                    
-                    // Remove the colliding cannonball and clean up ref
-                    setCannonballs(prev => prev.filter(b => b.id !== ball.id));
-                    delete cannonballRefs.current[ball.id];
-                    
-                    // Optional: Add some visual feedback
-                    console.log(`Ship "${word}" hit! Ships reset to start. Score: ${score + 1}`);
+                    // Check if it's the correct ship
+                    const isCorrectHit = shipIndex === correctShipIndex;
+
+                    if (isCorrectHit) {
+                        setScore((prevScore) => prevScore + 1);
+                        setLastHitCorrect(true);
+                        console.log(
+                            `Correct hit! "${word}" is the translation of "${currentDutchWord}"`,
+                        );
+
+                        // Clear ALL cannonballs immediately to prevent multiple hits
+                        setCannonballs([]);
+                        // Clear all cannonball refs
+                        Object.keys(cannonballRefs.current).forEach((id) => {
+                            delete cannonballRefs.current[id];
+                        });
+
+                        // Prevent shooting immediately and set flag
+                        setCanShoot(false);
+                        setCorrectHitInProgress(true);
+
+                        // Trigger hit feedback
+                        setHitShipIndex(shipIndex);
+                        setTimeout(() => {
+                            if (!gameOver) setHitShipIndex(null);
+                        }, 500);
+
+                        // Load new word challenge after correct hit
+                        setTimeout(async () => {
+                            if (!gameOver) {
+                                await setupNewWordChallenge(
+                                    gameModeRef.current,
+                                );
+                                setLastHitCorrect(null);
+                                setCorrectHitInProgress(false);
+                                setCanShoot(true); // Re-enable shooting when new challenge loads
+                            }
+                        }, 1000);
+
+                        correctHitOccurred = true;
+                        return; // Exit collision checking immediately
+                    } else {
+                        setLastHitCorrect(false);
+                        console.log(
+                            `Wrong hit! "${word}" is not the translation of "${currentDutchWord}"`,
+                        );
+
+                        // Destroy the wrong ship
+                        setDestroyedShips((prev) => [...prev, shipIndex]);
+
+                        // Lose a life for wrong hit
+                        setLifeLost(true);
+                        setTimeout(() => {
+                            if (!gameOver) setLifeLost(false);
+                        }, 1000);
+
+                        setLives((prevLives) => {
+                            const newLives = prevLives - 1;
+                            if (newLives <= 0) {
+                                // Game over - show game over screen
+                                setGameOver(true);
+                                setGameOverReason("No lives remaining!");
+                                // Clear all cannonballs immediately
+                                setCannonballs([]);
+                                Object.keys(cannonballRefs.current).forEach(
+                                    (id) => {
+                                        delete cannonballRefs.current[id];
+                                    },
+                                );
+                            }
+                            return newLives;
+                        });
+
+                        setTimeout(() => {
+                            if (!gameOver) setLastHitCorrect(null);
+                        }, 1000);
+
+                        // Trigger hit feedback
+                        setHitShipIndex(shipIndex);
+                        setTimeout(() => {
+                            if (!gameOver) setHitShipIndex(null);
+                        }, 500);
+
+                        // Remove the colliding cannonball
+                        setCannonballs((prev) =>
+                            prev.filter((b) => b.id !== ball.id),
+                        );
+                        delete cannonballRefs.current[ball.id];
+                    }
+
+                    break; // Exit ship checking loop for this cannonball
                 }
-            });
+            }
         });
     };
 
-    // Handle cannon movement
+    // Handle cannon movement - only move to non-destroyed ships
     const moveCannon = (direction) => {
-        setCannonPosition(prevPosition => {
-            if (direction === 'left' && prevPosition > 0) {
-                return prevPosition - 1;
-            } else if (direction === 'right' && prevPosition < shipWords.length - 1) {
-                return prevPosition + 1;
+        if (correctHitInProgress || isLoading || gameOver) return;
+
+        setCannonPosition((prevPosition) => {
+            let newPosition = prevPosition;
+
+            if (direction === "left") {
+                // Move left to the next non-destroyed ship
+                for (let i = prevPosition - 1; i >= 0; i--) {
+                    if (!destroyedShips.includes(i)) {
+                        newPosition = i;
+                        break;
+                    }
+                }
+            } else if (direction === "right") {
+                // Move right to the next non-destroyed ship
+                for (let i = prevPosition + 1; i < shipWords.length; i++) {
+                    if (!destroyedShips.includes(i)) {
+                        newPosition = i;
+                        break;
+                    }
+                }
             }
-            return prevPosition;
+
+            return newPosition;
         });
     };
 
     // Handle cannonball shooting
     const shootCannonball = () => {
-        if (!canShoot) return; // Prevent shooting during cooldown
-        
+        if (!canShoot || isLoading || correctHitInProgress || gameOver) return;
+
         const newCannonball = {
             id: Date.now(),
-            cannonPos: cannonPosition, // Store cannon position for this ball
-            currentY: 120, // Starting from above cannon position
-            targetShip: cannonPosition
+            cannonPos: cannonPosition,
+            currentY: 120,
+            targetShip: cannonPosition,
         };
-        
-        setCannonballs(prev => [...prev, newCannonball]);
-        
-        // Set cooldown
+
+        setCannonballs((prev) => [...prev, newCannonball]);
+
         setCanShoot(false);
         setTimeout(() => {
-            setCanShoot(true);
-        }, 300); // 300ms cooldown
-        
-        // Remove cannonball after animation completes (1.5 seconds)
+            if (!gameOver) setCanShoot(true);
+        }, 300);
+
         setTimeout(() => {
-            setCannonballs(prev => prev.filter(ball => ball.id !== newCannonball.id));
-            // Clean up ref
-            delete cannonballRefs.current[newCannonball.id];
+            if (!gameOver) {
+                setCannonballs((prev) =>
+                    prev.filter((ball) => ball.id !== newCannonball.id),
+                );
+                delete cannonballRefs.current[newCannonball.id];
+            }
         }, 1500);
     };
 
     // Keyboard event handler
     useEffect(() => {
+        if (gameOver) return; // Don't handle keyboard events when game is over
+
         const handleKeyPress = (event) => {
             switch (event.key) {
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
+                case "ArrowLeft":
+                case "a":
+                case "A":
                     event.preventDefault();
-                    moveCannon('left');
+                    moveCannon("left");
                     break;
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
+                case "ArrowRight":
+                case "d":
+                case "D":
                     event.preventDefault();
-                    moveCannon('right');
+                    moveCannon("right");
                     break;
-                case ' ': // Space key
-                    event.preventDefault(); // Prevent page scroll
+                case " ":
+                    event.preventDefault();
                     shootCannonball();
                     break;
                 default:
@@ -132,139 +489,399 @@ const GamePage = ({ onBackClick }) => {
             }
         };
 
-        window.addEventListener('keydown', handleKeyPress);
-        
-        // Cleanup event listener on component unmount
+        window.addEventListener("keydown", handleKeyPress);
         return () => {
-            window.removeEventListener('keydown', handleKeyPress);
+            window.removeEventListener("keydown", handleKeyPress);
         };
-    }, [canShoot, cannonPosition]); // Add dependencies
+    }, [
+        canShoot,
+        cannonPosition,
+        isLoading,
+        destroyedShips,
+        correctHitInProgress,
+        gameOver,
+    ]);
 
-    // Game timer effect (keep timer logic for future use)
+    // Game timer effect
     useEffect(() => {
+        if (gameOver || isGameTutorialOpen) return; // Don't run timer when game is over or tutorial is open
+
         const gameTimer = setInterval(() => {
-            setGameTime(prevTime => prevTime + 0.1); // Increment by 0.1 seconds
+            setGameTime((prevTime) => prevTime + 0.1);
         }, 100);
 
         return () => clearInterval(gameTimer);
-    }, [gameTime]);
+    }, [gameOver, isGameTutorialOpen]);
 
-    // Ship movement effect - speed increases with score
+    // Ship movement effect
     useEffect(() => {
+        if (isLoading || gameOver || isGameTutorialOpen) return;
+
         const moveShips = () => {
-            setShipsTop(prevTop => {
-                // Calculate speed based on score: starts at 0.5px/frame, increases by 0.2px every 5 points
+            setShipsTop((prevTop) => {
                 const baseSpeed = 0.5;
-                const speedIncrease = Math.floor(score / 5) * 0.2;
-                const maxSpeedIncrease = 2.0; // Cap the speed increase
-                const currentSpeed = baseSpeed + Math.min(speedIncrease, maxSpeedIncrease);
-                
-                // Use a fixed boundary based on viewport height - teleport at 60% of screen
-                // This accounts for the cannon area at the bottom
-                const bottomBoundary = window.innerHeight * 0.45; // 60% of viewport height
-                
-                // Check if we're about to exceed the boundary before moving
+                const speedIncrease = Math.floor(score / 50) * 0.2;
+                const maxSpeedIncrease = 2.0;
+                const currentSpeed =
+                    baseSpeed + Math.min(speedIncrease, maxSpeedIncrease);
+
+                const bottomBoundary = window.innerHeight * 0.45;
                 const newTop = prevTop + currentSpeed;
-                
-                // Teleport back to top when reaching the boundary
+
                 if (newTop >= bottomBoundary) {
-                    return 30; // Teleport back to starting position
+                    // Ships reached bottom - instant game over regardless of lives
+                    setGameOver(true);
+                    setGameOverReason("Ships reached the harbor!");
+                    // Clear all cannonballs immediately
+                    setCannonballs([]);
+                    Object.keys(cannonballRefs.current).forEach((id) => {
+                        delete cannonballRefs.current[id];
+                    });
+                    return newTop; // Keep ships at bottom position
                 }
-                
+
                 return newTop;
             });
         };
 
-        const movementInterval = setInterval(moveShips, 16); // ~60fps
-
+        const movementInterval = setInterval(moveShips, 16);
         return () => clearInterval(movementInterval);
-    }, [score]);
+    }, [score, isLoading, gameOver, isGameTutorialOpen]);
 
     // Collision detection effect
     useEffect(() => {
-        if (cannonballs.length === 0) return;
+        if (cannonballs.length === 0 || gameOver || isGameTutorialOpen) return;
 
         const collisionInterval = setInterval(() => {
             checkCollisions();
-        }, 16); // Check at 60fps
+        }, 16);
 
         return () => clearInterval(collisionInterval);
-    }, [cannonballs, shipsTop]); // Re-run when cannonballs or ship position changes
+    }, [
+        cannonballs,
+        shipWords,
+        correctShipIndex,
+        destroyedShips,
+        gameOver,
+        hitShipIndex,
+        correctHitInProgress,
+    ]);
 
-    // Calculate cannon position based on ship index
+    // Tutorial button timer effect - fade out after 3 seconds
+    useEffect(() => {
+        const fadeTimer = setTimeout(() => {
+            setTutorialButtonFading(true);
+        }, 3000);
+
+        const hideTimer = setTimeout(() => {
+            setShowTutorialButton(false);
+        }, 4000);
+
+        return () => {
+            clearTimeout(fadeTimer);
+            clearTimeout(hideTimer);
+        };
+    }, []);
+
+    // Initialize game mode and setup
+    useEffect(() => {
+        const initializeGameMode = async () => {
+            // Check for selected game mode
+            const selectedMode = localStorage.getItem("selectedGameMode");
+
+            // Only initialize if a mode was actually selected
+            if (selectedMode) {
+                // Clear the mode from storage first
+                localStorage.removeItem("selectedGameMode");
+
+                if (selectedMode === "wordlist") {
+                    const wordlist = getWordlistFromStorage();
+                    if (wordlist.length > 0) {
+                        setGameMode("wordlist");
+                        gameModeRef.current = "wordlist";
+                        const shuffled = [...wordlist].sort(
+                            () => Math.random() - 0.5,
+                        );
+                        setWordlistQueue(shuffled);
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+
+                // For random mode or fallback
+                setGameMode("random");
+                gameModeRef.current = "random";
+                await loadWordsIntoQueue();
+                setIsLoading(false);
+            }
+            // No mode selected yet - keep loading state true until mode is selected
+        };
+
+        initializeGameMode();
+    }, []);
+
+    // Setup initial word challenge after mode is set
+    useEffect(() => {
+        if (!isLoading && gameModeRef.current) {
+            setupNewWordChallenge(gameModeRef.current);
+        }
+    }, [isLoading, gameMode]);
+
+    // Handle game over cleanup
+    useEffect(() => {
+        if (gameOver) {
+            // Clear all cannonballs immediately when game ends
+            setCannonballs([]);
+            Object.keys(cannonballRefs.current).forEach((id) => {
+                delete cannonballRefs.current[id];
+            });
+            // Stop any ongoing actions
+            setCanShoot(false);
+            setCorrectHitInProgress(false);
+            setLastHitCorrect(null);
+            setHitShipIndex(null);
+            setLifeLost(false);
+        }
+    }, [gameOver]);
+
+    // Auto-adjust cannon position when ships are destroyed
+    useEffect(() => {
+        if (gameOver) return; // Don't adjust cannon when game is over
+
+        if (destroyedShips.includes(cannonPosition)) {
+            // Current position ship is destroyed, find nearest non-destroyed ship
+            let nearestIndex = -1;
+            let minDistance = Infinity;
+
+            shipWords.forEach((_, index) => {
+                if (!destroyedShips.includes(index)) {
+                    const distance = Math.abs(index - cannonPosition);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestIndex = index;
+                    }
+                }
+            });
+
+            if (nearestIndex !== -1) {
+                setCannonPosition(nearestIndex);
+            }
+        }
+    }, [destroyedShips, cannonPosition, shipWords, gameOver]);
+
+    // Calculate cannon position
     const calculateCannonLeft = () => {
-        // Ship container is centered, each ship is 250px wide with 40px gap
         const shipWidth = 250;
         const shipGap = 40;
         const totalShips = shipWords.length;
-        
-        // Calculate total width of ships container
-        const totalWidth = (shipWidth * totalShips) + (shipGap * (totalShips - 1));
-        
-        // Calculate offset from center for current ship
-        const centerOffset = (cannonPosition - Math.floor(totalShips / 2)) * (shipWidth + shipGap);
-        
-        // Return percentage from center
+
+        // Calculate position based on original ship index
+        const centerOffset =
+            (cannonPosition - Math.floor(totalShips / 2)) *
+            (shipWidth + shipGap);
         return `calc(50% + ${centerOffset}px)`;
     };
 
-    // Calculate position for any cannon index (for cannonballs)
     const calculatePositionForIndex = (index) => {
         const shipWidth = 250;
         const shipGap = 40;
         const totalShips = shipWords.length;
-        const centerOffset = (index - Math.floor(totalShips / 2)) * (shipWidth + shipGap);
+        const centerOffset =
+            (index - Math.floor(totalShips / 2)) * (shipWidth + shipGap);
         return `calc(50% + ${centerOffset}px)`;
+    };
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
     };
 
     return (
         <div className="game-page">
-            {/* Game Background */}
             <div className="game-background">
-                {/* Score Display */}
+                {/* Replay tutorial button - only show for first few seconds */}
+                {onReplayTutorial && showTutorialButton && (
+                    <button
+                        className={`replay-tutorial-button ${tutorialButtonFading ? "fade-out" : ""}`}
+                        onClick={onReplayTutorial}
+                        title="Replay Tutorial"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+                                fill="currentColor"
+                            />
+                        </svg>
+                        Tutorial
+                    </button>
+                )}
+
+                {/* Score and Lives Display */}
                 <div className="score-display">
-                    <span className="score-label">Score:</span>
-                    <span className="score-value">{score}</span>
+                    <div>
+                        <span className="score-label">Score:</span>{" "}
+                        <span className="score-value">{score}</span>
+                    </div>
+                    <div style={{ marginLeft: "20px" }}>
+                        <span className="score-label">Lives:</span>{" "}
+                        <span
+                            className={`score-value ${lifeLost ? "life-lost-flash" : ""}`}
+                        >
+                            {"❤️".repeat(lives)}
+                            {"🖤".repeat(Math.max(0, 3 - lives))}
+                        </span>
+                    </div>
                 </div>
 
-                {/* Ships Container */}
-                <div className="ships-container" style={{ top: `${shipsTop}px` }}>
-                    {shipWords.map((word, index) => (
-                        <div key={index} className={`ship-card ${index === cannonPosition ? 'highlighted' : ''} ${hitShipIndex === index ? 'hit-flash' : ''}`}>
-                            <img src="/assets/images/ship.png" alt="Ship" className="ship-image" />
-                            <div className="word-label">
-                                {word}
+                {/* Pause indicator when tutorial is open */}
+                {isGameTutorialOpen && (
+                    <div className="pause-overlay">
+                        <div className="pause-indicator">
+                            <h2>Game Paused</h2>
+                            <p>Tutorial in progress...</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Game Over Screen */}
+                {gameOver && (
+                    <div className="game-over-overlay">
+                        <div className="game-over-message">
+                            <h1>Game Over!</h1>
+                            <p className="game-over-reason">{gameOverReason}</p>
+                            <div className="game-over-stats">
+                                <p>
+                                    Final Score:{" "}
+                                    <span className="final-score">{score}</span>
+                                </p>
+                                <p>
+                                    Time:{" "}
+                                    <span className="final-time">
+                                        {formatTime(gameTime)}
+                                    </span>
+                                </p>
+                            </div>
+                            <div className="game-over-buttons">
+                                <button
+                                    className="restart-button"
+                                    onClick={restartGame}
+                                >
+                                    Play Again
+                                </button>
+                                <button
+                                    className="menu-button"
+                                    onClick={onBackClick}
+                                >
+                                    Back to Menu
+                                </button>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                )}
 
-                {/* Current Word Display */}
+                {/* Hit Feedback */}
+                {lastHitCorrect !== null && (
+                    <div
+                        className={`hit-feedback ${lastHitCorrect ? "correct" : "wrong"}`}
+                    >
+                        {lastHitCorrect ? "✓ Correct!" : "✗ Wrong!"}
+                    </div>
+                )}
+
+                {/* Ships Container */}
+                {isLoading ? (
+                    <div className="loading-display">
+                        <div className="loading-text">Loading new words...</div>
+                    </div>
+                ) : error ? (
+                    <div className="error-display">
+                        <div className="error-text">{error}</div>
+                        <button
+                            onClick={() =>
+                                setupNewWordChallenge(gameModeRef.current)
+                            }
+                            className="retry-button"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                ) : (
+                    <div
+                        className="ships-container"
+                        style={{ top: `${shipsTop}px` }}
+                    >
+                        {shipWords.map((word, index) => (
+                            <div
+                                key={index}
+                                className={`ship-card ${index === cannonPosition ? "highlighted" : ""} ${hitShipIndex === index ? "hit-flash" : ""} ${destroyedShips.includes(index) ? "destroyed" : ""}`}
+                                style={{
+                                    visibility: destroyedShips.includes(index)
+                                        ? "hidden"
+                                        : "visible",
+                                }}
+                            >
+                                <img
+                                    src={
+                                        redBullShips.includes(index)
+                                            ? "/assets/images/red_bull_car.png"
+                                            : "/assets/images/ship.png"
+                                    }
+                                    alt={
+                                        redBullShips.includes(index)
+                                            ? "Red Bull Racing Car"
+                                            : "Ship"
+                                    }
+                                    className="ship-image"
+                                />
+                                <div className="word-label">{word}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Current Dutch Word Display */}
                 <div className="current-word-display">
-                    {currentWord}
+                    <div className="word-language">🇳🇱 Dutch</div>
+                    <div className="word-text">{currentDutchWord}</div>
+                    <div className="word-instruction">
+                        Find the English translation!
+                    </div>
                 </div>
 
                 {/* Cannon */}
-                <div className="cannon-container" style={{ left: calculateCannonLeft() }}>
-                    <img src="/assets/images/cannon.png" alt="Cannon" className="cannon" />
+                <div
+                    className="cannon-container"
+                    style={{ left: calculateCannonLeft() }}
+                >
+                    <img
+                        src="/assets/images/cannon.png"
+                        alt="Cannon"
+                        className="cannon"
+                    />
                 </div>
 
                 {/* Cannonballs */}
-                {cannonballs.map(ball => (
-                    <div 
-                        key={ball.id} 
-                        ref={el => cannonballRefs.current[ball.id] = el}
-                        className="cannonball" 
-                        style={{ left: calculatePositionForIndex(ball.cannonPos) }}
+                {cannonballs.map((ball) => (
+                    <div
+                        key={ball.id}
+                        ref={(el) => (cannonballRefs.current[ball.id] = el)}
+                        className="cannonball"
+                        style={{
+                            left: calculatePositionForIndex(ball.cannonPos),
+                        }}
                     >
-                        <img src="/assets/images/cannonball.png" alt="Cannonball" />
+                        <img
+                            src="/assets/images/cannonball.png"
+                            alt="Cannonball"
+                        />
                     </div>
                 ))}
-
-                {/* Back Button */}
-                <button className="back-button" onClick={onBackClick}>
-                    ← Back to Menu
-                </button>
             </div>
         </div>
     );
