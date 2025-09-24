@@ -211,35 +211,27 @@
     box-sizing: border-box;
 }
 
-/* Swipe animations and feedback */
-.flashcard.swipe-right::before {
-    content: "✓ ADD";
+/* Swipe overlay styles */
+.swipe-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
     font-size: 48px;
     font-weight: bold;
-    color: rgba(76, 175, 80, 0.9);
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     z-index: 10;
     pointer-events: none;
     font-family: "Segoe UI", "Arial", sans-serif;
 }
 
-.flashcard.swipe-left::before {
-    content: "✗ SKIP";
-    position: absolute;
-    top: 50%;
-    left: 50%;
+.swipe-overlay-right {
+    transform: translate(-50%, -50%) rotate(-15deg);
+    color: rgba(76, 175, 80, 0.9);
+}
+
+.swipe-overlay-left {
     transform: translate(-50%, -50%) rotate(15deg);
-    font-size: 48px;
-    font-weight: bold;
     color: rgba(244, 67, 54, 0.9);
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-    z-index: 10;
-    pointer-events: none;
-    font-family: "Segoe UI", "Arial", sans-serif;
 }
 
 /* Disable flashcard interactions during tutorial */
