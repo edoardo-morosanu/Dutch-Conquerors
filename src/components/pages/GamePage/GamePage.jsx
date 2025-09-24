@@ -49,6 +49,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const [tutorialButtonFading, setTutorialButtonFading] = useState(false);
     const [sinkingShips, setSinkingShips] = useState([]);
     const correctHitInProgressRef = useRef(false);
+    const scoreRef = useRef(0);
 
     // Calculate current level based on score (every 5 points = 1 level)
     const calculateLevel = (currentScore) => {
@@ -142,6 +143,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
         setGameOver(false);
         setGameOverReason("");
         setScore(0);
+        scoreRef.current = 0;
         setLevel(1);
         setShowLevelUp(false);
         setLives(3);
@@ -364,6 +366,9 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                                 showLevelUpNotification();
                             }
 
+                            // Also update the ref to keep it in sync
+                            scoreRef.current = newScore;
+
                             return newScore;
                         });
                         setLastHitCorrect(true);
@@ -393,6 +398,10 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         setTimeout(async () => {
                             if (!gameOver) {
                                 setHitShipIndex(null);
+
+                                // Force immediate ship reset BEFORE setupNewWordChallenge
+                                setShipsTop(60);
+
                                 await setupNewWordChallenge(
                                     gameModeRef.current,
                                 );
@@ -400,17 +409,27 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                                 setLastHitWasRedBull(false);
                                 setSinkingShips([]); // Clear sinking ships
                                 setCanShoot(true); // Re-enable shooting when new challenge loads
-                            }
-                        }, 800);
 
-                        // Reset correctHitInProgress after the full timeout duration
-                        setTimeout(() => {
-                            setCorrectHitInProgress(false);
-                            correctHitInProgressRef.current = false;
-                            console.log(
-                                "correctHitInProgress set to FALSE after timeout",
-                            );
-                        }, 800);
+                                // Wait for React to process the ship position update
+                                setTimeout(() => {
+                                    if (!gameOver) {
+                                        // Double-check that ships are at safe position before disabling protection
+                                        setShipsTop(60); // Force position again just to be sure
+
+                                        // Wait one more frame for the position to be applied
+                                        setTimeout(() => {
+                                            if (!gameOver) {
+                                                setCorrectHitInProgress(false);
+                                                correctHitInProgressRef.current = false;
+                                                console.log(
+                                                    "correctHitInProgress set to FALSE after ships confirmed at safe position",
+                                                );
+                                            }
+                                        }, 50);
+                                    }
+                                }, 50);
+                            }
+                        }, 1200);
 
                         correctHitOccurred = true;
                         return; // Exit collision checking immediately
@@ -589,7 +608,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
             setShipsTop((prevTop) => {
                 const baseSpeed = 0.5;
                 // Moderate speed increase: every level increases speed by 0.3
-                const currentLevel = calculateLevel(score);
+                const currentLevel = calculateLevel(scoreRef.current);
                 const speedIncrease = (currentLevel - 1) * 0.3;
                 const currentSpeed = baseSpeed + speedIncrease;
 
@@ -597,11 +616,12 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                 const newTop = prevTop + currentSpeed;
 
                 if (newTop >= bottomBoundary) {
-                    // Ships reached bottom - instant game over unless correct hit in progress
+                    // Ships reached bottom - check if protection is active
                     console.log(
                         "Ships reached bottom. correctHitInProgress:",
                         correctHitInProgressRef.current,
                     );
+
                     if (!correctHitInProgressRef.current) {
                         setGameOver(true);
                         setGameOverReason("Ships reached the harbor!");
@@ -611,7 +631,8 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                             delete cannonballRefs.current[id];
                         });
                     }
-                    return newTop; // Keep ships at bottom position
+                    // Always return boundary position to prevent ships from going further
+                    return bottomBoundary - 1;
                 }
 
                 return newTop;
@@ -620,7 +641,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
 
         const movementInterval = setInterval(moveShips, 16);
         return () => clearInterval(movementInterval);
-    }, [score, isLoading, gameOver, isGameTutorialOpen]);
+    }, [isLoading, gameOver, isGameTutorialOpen]);
 
     // Collision detection effect
     useEffect(() => {

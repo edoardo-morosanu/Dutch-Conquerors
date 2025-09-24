@@ -37,8 +37,8 @@
     border: 3px solid #4a9b8e;
     border-radius: 20px;
     padding: 25px;
-    width: 600px;
-    height: 420px;
+    width: 750px;
+    height: 550px;
     color: white;
     font-family: "Cinzel Decorative", serif;
     box-shadow:
@@ -210,7 +210,7 @@
     background: rgba(74, 155, 142, 0.1);
     border-radius: 12px;
     border: 1px solid rgba(74, 155, 142, 0.3);
-    max-height: 160px;
+    max-height: 220px;
     overflow-y: auto;
 }
 
@@ -349,7 +349,7 @@
 @media (max-width: 768px) {
     .first-popup-content {
         width: 90vw;
-        height: 70vh;
+        height: 80vh;
         padding: 20px;
         margin: 20px;
         top: 40%;
@@ -393,14 +393,14 @@
     .tutorial-step-content {
         padding: 10px;
         margin: 10px 0;
-        max-height: 140px;
+        max-height: 180px;
     }
 }
 
 @media (max-width: 480px) {
     .first-popup-content {
         width: 95vw;
-        height: 75vh;
+        height: 85vh;
         padding: 15px;
         top: 40%;
     }

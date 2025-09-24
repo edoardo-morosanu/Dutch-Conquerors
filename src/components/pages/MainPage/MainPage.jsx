@@ -4,6 +4,7 @@ import "./MainPage.css";
 const MainPage = ({
     onPlayClick,
     onLearnClick,
+    onWordlistClick,
     isMuted,
     musicReady,
     toggleMute,
@@ -141,6 +142,41 @@ const MainPage = ({
                                             strokeWidth="1.5"
                                             strokeLinecap="round"
                                         ></path>{" "}
+                                    </g>
+                                </svg>
+                                <div className="compass-ring"></div>
+                                <div className="rope-decoration left"></div>
+                                <div className="rope-decoration right"></div>
+                            </div>
+                        </div>
+                    </button>
+                    <button
+                        className="nautical-icon-button wordlist-button"
+                        onClick={onWordlistClick}
+                        title="View Your Wordlist"
+                    >
+                        <div className="button-anchor">
+                            <div className="button-content">
+                                <svg
+                                    width="35px"
+                                    height="35px"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <g strokeWidth="0"></g>
+                                    <g
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    ></g>
+                                    <g>
+                                        <path
+                                            d="M8 6L21 6.00078M8 12L21 12.0008M8 18L21 18.0007M3 6.5H4V5.5H3V6.5ZM3 12.5H4V11.5H3V12.5ZM3 18.5H4V17.5H3V18.5Z"
+                                            stroke="#ffffff"
+                                            strokeWidth="1.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
                                     </g>
                                 </svg>
                                 <div className="compass-ring"></div>

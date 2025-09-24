@@ -1,0 +1,562 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap");
+
+.wordlist-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(3px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.wordlist-popup-content {
+    background: linear-gradient(145deg, #2a4a5c, #1e3a4a);
+    border: 3px solid #4a9b8e;
+    border-radius: 20px;
+    padding: 25px;
+    width: 750px;
+    height: 650px;
+    color: white;
+    font-family: "Cinzel Decorative", serif;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.8),
+        inset 0 2px 0 rgba(255, 255, 255, 0.1);
+    animation: slideIn 0.4s ease-out;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.wordlist-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(74, 155, 142, 0.3);
+    padding-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.wordlist-popup-title {
+    font-size: 24px;
+    margin: 0;
+    color: #4a9b8e;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wordlist-icon {
+    font-size: 28px;
+}
+
+.wordlist-close-btn {
+    background: none;
+    border: none;
+    color: #cccccc;
+    font-size: 32px;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.wordlist-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: scale(1.1);
+}
+
+.wordlist-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    background: rgba(74, 155, 142, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(74, 155, 142, 0.3);
+    flex-shrink: 0;
+}
+
+.word-count {
+    font-size: 16px;
+    font-weight: bold;
+    color: #4a9b8e;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.filtered-count {
+    font-size: 14px;
+    color: #a0d4cc;
+    font-style: italic;
+}
+
+.wordlist-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.wordlist-search {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 2px solid rgba(74, 155, 142, 0.3);
+    border-radius: 10px;
+    background: rgba(42, 74, 92, 0.5);
+    color: white;
+    font-size: 16px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.wordlist-search::placeholder {
+    color: #a0d4cc;
+}
+
+.wordlist-search:focus {
+    border-color: #4a9b8e;
+    box-shadow: 0 0 0 2px rgba(74, 155, 142, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    font-size: 18px;
+    color: #a0d4cc;
+    pointer-events: none;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sort-label {
+    font-size: 14px;
+    color: #cccccc;
+    font-weight: bold;
+}
+
+.sort-btn {
+    padding: 8px 12px;
+    border: 2px solid rgba(74, 155, 142, 0.3);
+    border-radius: 8px;
+    background: rgba(42, 74, 92, 0.5);
+    color: #cccccc;
+    font-size: 14px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sort-btn:hover {
+    border-color: #4a9b8e;
+    background: rgba(74, 155, 142, 0.2);
+    color: white;
+}
+
+.sort-btn.active {
+    background: #4a9b8e;
+    color: white;
+    border-color: #4a9b8e;
+    font-weight: bold;
+}
+
+.wordlist-body {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.empty-wordlist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.empty-wordlist h3 {
+    font-size: 24px;
+    color: #4a9b8e;
+    margin: 0 0 15px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.empty-wordlist p {
+    font-size: 16px;
+    color: #cccccc;
+    margin: 5px 0;
+    line-height: 1.4;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.empty-hint {
+    color: #a0d4cc !important;
+    font-style: italic;
+    font-size: 14px !important;
+}
+
+.wordlist-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.word-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: rgba(42, 74, 92, 0.3);
+    border: 1px solid rgba(74, 155, 142, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.word-item:hover {
+    background: rgba(42, 74, 92, 0.5);
+    border-color: rgba(74, 155, 142, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.word-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.word-pair {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.english-word {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.word-separator {
+    font-size: 16px;
+    color: #4a9b8e;
+    font-weight: bold;
+}
+
+.dutch-word {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a9b8e;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.word-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.date-added {
+    font-size: 12px;
+    color: #a0d4cc;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.remove-word-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: #cccccc;
+    opacity: 0.7;
+}
+
+.remove-word-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff6b6b;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.wordlist-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.clear-all-btn {
+    padding: 12px 24px;
+    border: 2px solid rgba(255, 107, 107, 0.5);
+    border-radius: 10px;
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    font-size: 16px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-all-btn:hover {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: #ff6b6b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.2);
+}
+
+.confirm-clear {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.confirm-text {
+    font-size: 16px;
+    color: #cccccc;
+    font-weight: bold;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.confirm-yes-btn {
+    padding: 10px 20px;
+    border: 2px solid #ff6b6b;
+    border-radius: 8px;
+    background: #ff6b6b;
+    color: white;
+    font-size: 14px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-yes-btn:hover {
+    background: #ff5252;
+    border-color: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+}
+
+.confirm-no-btn {
+    padding: 10px 20px;
+    border: 2px solid rgba(74, 155, 142, 0.5);
+    border-radius: 8px;
+    background: rgba(74, 155, 142, 0.1);
+    color: #4a9b8e;
+    font-size: 14px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-no-btn:hover {
+    background: rgba(74, 155, 142, 0.2);
+    border-color: #4a9b8e;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Custom scrollbar for wordlist body */
+.wordlist-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.wordlist-body::-webkit-scrollbar-track {
+    background: rgba(42, 74, 92, 0.3);
+    border-radius: 4px;
+}
+
+.wordlist-body::-webkit-scrollbar-thumb {
+    background: rgba(74, 155, 142, 0.5);
+    border-radius: 4px;
+}
+
+.wordlist-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 155, 142, 0.7);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .wordlist-popup-content {
+        width: 90vw;
+        height: 85vh;
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .wordlist-popup-title {
+        font-size: 20px;
+    }
+
+    .word-pair {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .word-separator {
+        transform: rotate(90deg);
+        font-size: 14px;
+    }
+
+    .english-word,
+    .dutch-word {
+        font-size: 16px;
+    }
+
+    .sort-controls {
+        justify-content: center;
+    }
+
+    .confirm-clear {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wordlist-popup-content {
+        width: 95vw;
+        height: 90vh;
+        padding: 15px;
+    }
+
+    .wordlist-popup-title {
+        font-size: 18px;
+    }
+
+    .wordlist-icon {
+        font-size: 24px;
+    }
+
+    .english-word,
+    .dutch-word {
+        font-size: 14px;
+    }
+
+    .word-item {
+        padding: 12px;
+    }
+
+    .sort-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+    }
+
+    .empty-wordlist h3 {
+        font-size: 20px;
+    }
+
+    .empty-wordlist p {
+        font-size: 14px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .wordlist-popup-content {
+        border: 4px solid white;
+        background: #000000;
+    }
+
+    .word-item {
+        border: 2px solid white;
+        background: #333333;
+    }
+
+    .clear-all-btn {
+        border: 3px solid #ff6b6b;
+        background: #660000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .wordlist-popup-overlay,
+    .wordlist-popup-content {
+        animation: none;
+    }
+
+    .word-item:hover,
+    .clear-all-btn:hover,
+    .confirm-yes-btn:hover,
+    .confirm-no-btn:hover {
+        transform: none;
+    }
+
+    .remove-word-btn:hover {
+        transform: none;
+    }
+}

@@ -7,6 +7,7 @@ import FirstPopup from "./components/ui/FirstPopup/FirstPopup";
 import LearnTutorial from "./components/ui/LearnTutorial/LearnTutorial";
 import GameTutorial from "./components/ui/GameTutorial/GameTutorial";
 import GameModePopup from "./components/ui/GameModePopup/GameModePopup";
+import WordlistPopup from "./components/ui/WordlistPopup/WordlistPopup";
 
 function App() {
     // Page state management
@@ -26,6 +27,7 @@ function App() {
     const [showGameTutorial, setShowGameTutorial] = useState(false);
     const [showGameModePopup, setShowGameModePopup] = useState(false);
     const [showMainTutorial, setShowMainTutorial] = useState(false);
+    const [showWordlistPopup, setShowWordlistPopup] = useState(false);
     const [volume, setVolume] = useState(() => {
         const saved = localStorage.getItem("musicVolume");
         return saved ? parseFloat(saved) : 0.3;
@@ -154,6 +156,8 @@ function App() {
         if (wordlist.length > 0) {
             setShowGameModePopup(true);
         } else {
+            // No personal wordlist - set default random mode and go to game
+            localStorage.setItem("selectedGameMode", "random");
             setCurrentPage("game");
         }
     };
@@ -194,6 +198,14 @@ function App() {
         setCurrentPage("main");
     };
 
+    const handleWordlistClick = () => {
+        setShowWordlistPopup(true);
+    };
+
+    const handleWordlistClose = () => {
+        setShowWordlistPopup(false);
+    };
+
     // Pass music props to pages
     const musicProps = {
         isMuted,
@@ -208,6 +220,7 @@ function App() {
                 <MainPage
                     onPlayClick={handlePlayClick}
                     onLearnClick={handleLearnClick}
+                    onWordlistClick={handleWordlistClick}
                     onReplayTutorial={handleReplayMainTutorial}
                     {...musicProps}
                 />
@@ -224,6 +237,10 @@ function App() {
                     onModeSelect={handleGameModeSelect}
                     onClose={handleGameModeClose}
                     wordlistCount={getWordlistFromStorage().length}
+                />
+                <WordlistPopup
+                    isOpen={showWordlistPopup}
+                    onClose={handleWordlistClose}
                 />
             </>
         );

@@ -68,20 +68,51 @@ const FirstPopup = ({ isOpen, onComplete }) => {
                                 </span>
                             </div>
                         </div>
-                        <div className="control-entry">
-                            <div className="nautical-key">ESC</div>
-                            <div className="control-description">
-                                <span className="control-name">
-                                    Pause Orders
-                                </span>
-                                <span className="control-detail">
-                                    Halt battle and access menu
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             ),
+        },
+        {
+            id: "flashcard-info",
+            title: "Build Your Vocabulary",
+            description:
+                "Discover the flashcard system to expand your Dutch vocabulary!",
+            buttonText:
+                "Visit the Learn page to practice with flashcards and save words to your personal wordlist for focused game practice",
+            highlightSelector: null,
+            position: "center",
+            content: (
+                <div className="tutorial-rules-content">
+                    <div className="maritime-section">
+                        <div className="section-anchor">📚</div>
+                        <h4 className="section-title">Flashcard Learning</h4>
+                        <ul className="maritime-list">
+                            <li>
+                                Swipe right on flashcards to save words to your
+                                personal wordlist
+                            </li>
+                            <li>
+                                Use your saved words in targeted game practice
+                                sessions
+                            </li>
+                            <li>
+                                Build vocabulary at your own pace with
+                                interactive flashcards
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            id: "wordlist-info",
+            title: "Manage Your Wordlist",
+            description: "View and manage your saved vocabulary words!",
+            buttonText:
+                "Click the wordlist button to view, search, and remove saved words from your personal collection",
+            highlightSelector: ".wordlist-button",
+            position: "center",
+            showArrow: true,
         },
         {
             id: "replay-info",
