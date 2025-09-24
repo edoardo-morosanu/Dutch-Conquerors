@@ -260,14 +260,8 @@ const LearnPage = ({ onBackClick, onReplayTutorial, isTutorialOpen }) => {
             const maxStretch = 1.08; // Maximum 8% stretch
             const finalStretch = Math.min(stretchFactor, maxStretch);
 
-            // Apply swipe transforms while preserving CSS flip
-            cardRef.current.style.transform = `
-        translateX(${diffX}px) 
-        translateY(${diffY * 0.7}px) 
-        rotateX(${rotationX}deg) 
-        rotateZ(${rotationZ}deg)
-        scale(${finalStretch})
-      `;
+            // Apply swipe transforms
+            cardRef.current.style.transform = `translateX(${diffX}px) translateY(${diffY * 0.7}px) rotateX(${rotationX}deg) rotateZ(${rotationZ}deg) scale(${finalStretch})`;
             cardRef.current.style.opacity = opacity;
 
             // Visual feedback based on horizontal movement (main swipe direction)
@@ -305,12 +299,8 @@ const LearnPage = ({ onBackClick, onReplayTutorial, isTutorialOpen }) => {
                 const finalRotationZ = diffX > 0 ? "30deg" : "-30deg";
                 const finalRotationX = diffY * 0.05;
 
-                cardRef.current.style.transform = `
-          translateX(${finalX}) 
-          translateY(${finalY}px) 
-          rotateX(${finalRotationX}deg) 
-          rotateZ(${finalRotationZ})
-        `;
+                // Apply exit animation
+                cardRef.current.style.transform = `translateX(${finalX}) translateY(${finalY}px) rotateX(${finalRotationX}deg) rotateZ(${finalRotationZ})`;
                 cardRef.current.style.opacity = "0";
 
                 // Handle wordlist saving for right swipes
@@ -441,6 +431,12 @@ const LearnPage = ({ onBackClick, onReplayTutorial, isTutorialOpen }) => {
                                     </div>
                                     <div className="word">{dutchWord}</div>
                                 </div>
+                                {/* Swipe overlay for front face */}
+                                {swipeDirection && (
+                                    <div className={`swipe-overlay swipe-overlay-${swipeDirection}`}>
+                                        {swipeDirection === "right" ? "✓ ADD" : "✗ SKIP"}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Card back */}
@@ -459,6 +455,12 @@ const LearnPage = ({ onBackClick, onReplayTutorial, isTutorialOpen }) => {
                                     </div>
                                     <div className="word">{englishWord}</div>
                                 </div>
+                                {/* Swipe overlay for back face */}
+                                {swipeDirection && (
+                                    <div className={`swipe-overlay swipe-overlay-${swipeDirection}`}>
+                                        {swipeDirection === "right" ? "✓ ADD" : "✗ SKIP"}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
