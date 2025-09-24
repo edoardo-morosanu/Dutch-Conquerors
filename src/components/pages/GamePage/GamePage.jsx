@@ -17,6 +17,8 @@ const getWordlistFromStorage = () => {
 const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const [score, setScore] = useState(0);
     const [lives, setLives] = useState(3);
+    const [level, setLevel] = useState(1);
+    const [showLevelUp, setShowLevelUp] = useState(false);
 
     const [currentDutchWord, setCurrentDutchWord] = useState("");
     const [currentEnglishWord, setCurrentEnglishWord] = useState("");
@@ -45,6 +47,27 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
     const [lifeLost, setLifeLost] = useState(false);
     const [showTutorialButton, setShowTutorialButton] = useState(true);
     const [tutorialButtonFading, setTutorialButtonFading] = useState(false);
+    const [sinkingShips, setSinkingShips] = useState([]);
+    const correctHitInProgressRef = useRef(false);
+
+    // Calculate current level based on score (every 5 points = 1 level)
+    const calculateLevel = (currentScore) => {
+        return Math.floor(currentScore / 5) + 1;
+    };
+
+    // Get ship image based on level
+    const getShipImage = (currentLevel) => {
+        if (currentLevel <= 6) {
+            return `/assets/images/level${currentLevel}_ship.png`;
+        }
+        return `/assets/images/level6_ship.png`; // Max level ship for levels above 6
+    };
+
+    // Show level up notification
+    const showLevelUpNotification = () => {
+        setShowLevelUp(true);
+        setTimeout(() => setShowLevelUp(false), 2000); // Show for 2 seconds
+    };
 
     // Function to get multiple random English words from local JSON data
     const getRandomWords = (count = 10) => {
@@ -119,10 +142,13 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
         setGameOver(false);
         setGameOverReason("");
         setScore(0);
+        setLevel(1);
+        setShowLevelUp(false);
         setLives(3);
         setGameTime(0);
         setDestroyedShips([]);
         setRedBullShips([]);
+        setSinkingShips([]);
         setShipsTop(60);
         setCannonballs([]);
         setHitShipIndex(null);
@@ -130,6 +156,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
         setLastHitWasRedBull(false);
         setLifeLost(false);
         setCorrectHitInProgress(false);
+        correctHitInProgressRef.current = false;
         setCanShoot(true);
         setGameTime(0);
 
@@ -326,7 +353,19 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         const isRedBullShip = redBullShips.includes(shipIndex);
                         const scoreToAdd = isRedBullShip ? 5 : 1;
 
-                        setScore((prevScore) => prevScore + scoreToAdd);
+                        setScore((prevScore) => {
+                            const newScore = prevScore + scoreToAdd;
+                            const oldLevel = calculateLevel(prevScore);
+                            const newLevel = calculateLevel(newScore);
+
+                            // Check for level up
+                            if (newLevel > oldLevel) {
+                                setLevel(newLevel);
+                                showLevelUpNotification();
+                            }
+
+                            return newScore;
+                        });
                         setLastHitCorrect(true);
                         setLastHitWasRedBull(isRedBullShip);
                         console.log(
@@ -343,25 +382,35 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         // Prevent shooting immediately and set flag
                         setCanShoot(false);
                         setCorrectHitInProgress(true);
+                        correctHitInProgressRef.current = true;
+                        console.log("correctHitInProgress set to TRUE");
 
-                        // Trigger hit feedback
+                        // Trigger hit feedback and start sinking
                         setHitShipIndex(shipIndex);
-                        setTimeout(() => {
-                            if (!gameOver) setHitShipIndex(null);
-                        }, 500);
+                        setSinkingShips((prev) => [...prev, shipIndex]);
 
-                        // Load new word challenge after correct hit
+                        // Load new word challenge after brief pause
                         setTimeout(async () => {
                             if (!gameOver) {
+                                setHitShipIndex(null);
                                 await setupNewWordChallenge(
                                     gameModeRef.current,
                                 );
                                 setLastHitCorrect(null);
                                 setLastHitWasRedBull(false);
-                                setCorrectHitInProgress(false);
+                                setSinkingShips([]); // Clear sinking ships
                                 setCanShoot(true); // Re-enable shooting when new challenge loads
                             }
-                        }, 1000);
+                        }, 800);
+
+                        // Reset correctHitInProgress after the full timeout duration
+                        setTimeout(() => {
+                            setCorrectHitInProgress(false);
+                            correctHitInProgressRef.current = false;
+                            console.log(
+                                "correctHitInProgress set to FALSE after timeout",
+                            );
+                        }, 800);
 
                         correctHitOccurred = true;
                         return; // Exit collision checking immediately
@@ -539,23 +588,29 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
         const moveShips = () => {
             setShipsTop((prevTop) => {
                 const baseSpeed = 0.5;
-                const speedIncrease = Math.floor(score / 50) * 0.2;
-                const maxSpeedIncrease = 2.0;
-                const currentSpeed =
-                    baseSpeed + Math.min(speedIncrease, maxSpeedIncrease);
+                // Moderate speed increase: every level increases speed by 0.3
+                const currentLevel = calculateLevel(score);
+                const speedIncrease = (currentLevel - 1) * 0.3;
+                const currentSpeed = baseSpeed + speedIncrease;
 
                 const bottomBoundary = window.innerHeight * 0.45;
                 const newTop = prevTop + currentSpeed;
 
                 if (newTop >= bottomBoundary) {
-                    // Ships reached bottom - instant game over regardless of lives
-                    setGameOver(true);
-                    setGameOverReason("Ships reached the harbor!");
-                    // Clear all cannonballs immediately
-                    setCannonballs([]);
-                    Object.keys(cannonballRefs.current).forEach((id) => {
-                        delete cannonballRefs.current[id];
-                    });
+                    // Ships reached bottom - instant game over unless correct hit in progress
+                    console.log(
+                        "Ships reached bottom. correctHitInProgress:",
+                        correctHitInProgressRef.current,
+                    );
+                    if (!correctHitInProgressRef.current) {
+                        setGameOver(true);
+                        setGameOverReason("Ships reached the harbor!");
+                        // Clear all cannonballs immediately
+                        setCannonballs([]);
+                        Object.keys(cannonballRefs.current).forEach((id) => {
+                            delete cannonballRefs.current[id];
+                        });
+                    }
                     return newTop; // Keep ships at bottom position
                 }
 
@@ -657,6 +712,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
             // Stop any ongoing actions
             setCanShoot(false);
             setCorrectHitInProgress(false);
+            correctHitInProgressRef.current = false;
             setLastHitCorrect(null);
             setLastHitWasRedBull(false);
             setHitShipIndex(null);
@@ -743,15 +799,15 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                 )}
 
                 {/* Score and Lives Display */}
-                <div className="score-display">
-                    <div>
-                        <span className="score-label">Score:</span>{" "}
+                <div className="game-ui">
+                    <div className="score-display">
+                        <span className="score-label">Score: </span>
                         <span className="score-value">{score}</span>
-                    </div>
-                    <div style={{ marginLeft: "20px" }}>
-                        <span className="score-label">Lives:</span>{" "}
+                        <span className="level-label"> | Level: </span>
+                        <span className="level-value">{level}</span>
+                        <span className="lives-label"> | Lives: </span>
                         <span
-                            className={`score-value ${lifeLost ? "life-lost-flash" : ""}`}
+                            className={`lives-value ${lifeLost ? "life-lost-flash" : ""}`}
                         >
                             {"❤️".repeat(lives)}
                             {"🖤".repeat(Math.max(0, 3 - lives))}
@@ -838,12 +894,13 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                 ) : (
                     <div
                         className="ships-container"
+                        data-level={level}
                         style={{ top: `${shipsTop}px` }}
                     >
                         {shipWords.map((word, index) => (
                             <div
                                 key={index}
-                                className={`ship-card ${index === cannonPosition ? "highlighted" : ""} ${hitShipIndex === index ? "hit-flash" : ""} ${destroyedShips.includes(index) ? "destroyed" : ""}`}
+                                className={`ship-card ${index === cannonPosition ? "highlighted" : ""} ${hitShipIndex === index ? "hit-flash" : ""} ${sinkingShips.includes(index) ? "sinking" : ""} ${destroyedShips.includes(index) ? "destroyed" : ""}`}
                                 style={{
                                     visibility: destroyedShips.includes(index)
                                         ? "hidden"
@@ -854,7 +911,7 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                                     src={
                                         redBullShips.includes(index)
                                             ? "/assets/images/red_bull_car.png"
-                                            : "/assets/images/ship.png"
+                                            : getShipImage(level)
                                     }
                                     alt={
                                         redBullShips.includes(index)
@@ -906,6 +963,16 @@ const GamePage = ({ onBackClick, onReplayTutorial, isGameTutorialOpen }) => {
                         />
                     </div>
                 ))}
+
+                {/* Level Up Notification */}
+                {showLevelUp && (
+                    <div className="level-up-notification">
+                        <div className="level-up-content">
+                            <h2>Level {level}</h2>
+                            <p>Ships move faster!</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
